@@ -3,13 +3,18 @@ require "io/console"
 module Cursorable
 
   KEYMAP = {
-
+    " " => :select,
     "w" => :up,
     "a" => :left,
     "s" => :down,
     "d" => :right,
     "h" => :select,
-    "\u0003" => :ctrl_c
+    "\u0003" => :ctrl_c,
+    "\r" => :select,
+    "\e[A" => :up,
+    "\e[B" => :down,
+    "\e[C" => :right,
+    "\e[D" => :left
   }
 
   MOVES = {

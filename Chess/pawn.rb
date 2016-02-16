@@ -16,7 +16,8 @@ class Pawn < Piece
     capture_right = color == "white" ? [@curr_pos[0] - 1, @curr_pos[1] + 1] : [@curr_pos[0] + 1, @curr_pos[1] + 1]
 
     new_moves << move_up if @board.is_empty?(move_up) && @board.in_bounds?(move_up)
-    new_moves << move_up_first if @board.is_empty?(move_up_first) && !@has_moved && @board.in_bounds?(move_up_first)
+    new_moves << move_up_first if @board.is_empty?(move_up_first) && !@has_moved && @board.in_bounds?(move_up_first) &&
+                                  @board.is_empty?(move_up)
     new_moves << capture_left if !@board.is_empty?(capture_left) &&
                                   @board[capture_left].color != color && @board.in_bounds?(capture_left)
                                 #  debugger

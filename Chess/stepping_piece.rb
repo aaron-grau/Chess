@@ -35,7 +35,7 @@ module SteppingPiece
     all_moves = []
     direction.each do |change|
       new_pos = [change[0] + pos[0], change[1] + pos[1]]
-      if @board.in_bounds?(new_pos)# && (@board.is_empty?(new_pos) || @board[new_pos].color == self.color)
+      if @board.in_bounds?(new_pos) && (@board.is_empty?(new_pos) || @board[new_pos].color != self.color)
         all_moves << new_pos
       end
     end

@@ -15,8 +15,10 @@ class Display
     system('clear')
     @board.grid.each_with_index do |row, idx1|
       row.each_with_index do |tile, idx2|
-        print tile.to_s + " " unless [idx1,idx2] == @cursor_pos
-        print tile.to_s.on_red + " " if [idx1,idx2] == @cursor_pos
+        print tile.to_s + " " unless [idx1,idx2] == @cursor_pos || @board[[idx1, idx2]].selected
+        #debugger
+        print tile.to_s.on_red + " " if [idx1,idx2] == @cursor_pos && !@board[[idx1, idx2]].selected
+        print tile.to_s.on_yellow + " " if @board[[idx1,idx2]].selected
       end
       print "\n"
     end
@@ -25,9 +27,8 @@ class Display
   def navigate
     render
     input = get_input
-    navigate unless @selected == true
+    return navigate unless @selected
     @selected = false
-
     input
   end
 
