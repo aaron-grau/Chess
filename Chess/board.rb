@@ -1,15 +1,3 @@
-require_relative "display"
-require_relative 'sliding_piece'
-require_relative 'stepping_piece'
-require_relative 'piece'
-require_relative 'bishop'
-require_relative 'king'
-require_relative 'knight'
-require_relative 'queen'
-require_relative 'rook'
-require_relative 'pawn'
-require 'colorize'
-require 'byebug'
 class Board
 
   attr_reader :grid
@@ -35,11 +23,9 @@ class Board
     Rook.new(self, [7,7])
   ]
 
-  def initialize
+  def initialize(set = true)
     @grid = Array.new(8){Array.new(8){" "}}
-    set_board
-    @grid[2][2] = Knight.new(self, [2,2])
-    @grid[2][4] = Knight.new(self, [2,4])
+    set_board if set
   end
 
   def [](pos)
@@ -72,19 +58,24 @@ class Board
     end
   end
 
-  def move(start,end_pos)
+  def move(pos)
+    start,end_pos = pos
     start_row, start_col = start
     end_row, end_col = end_pos
     start_piece = @grid[start_row][start_col]
-    raise IllegalMoveError("This is an illegal move!") unless legal_move?
+    legal_move?(start,end_pos)
 
     @grid[end_row][end_col] = start_piece
-    start_piece = nil
-
+    @grid[start_row][start_col] = " "
+    start_piece.curr_pos = end_pos
   end
 
   def legal_move?(start, end_pos)
-    return false if start.nil?
+    start_row, start_col = start
+    end_row, end_col = end_pos
+    piece = grid[start_row][start_col]
+    raise IllegalMoveError.new("Illegal Move!") unless piece.legal_moves(self).include?(end_pos)
+    piece.legal_moves(self).include?(end_pos)
   end
 
   def legal_moves(color)
@@ -93,23 +84,14 @@ class Board
       @grid.flatten.select do |tile|
         tile.class < Piece && tile.color == color
       end
-    debugger
     pieces.each do |piece|
-      moves = piece.moves(self)
-      moves.each do |move|
-        cur_row, cur_col = piece.curr_pos[0], piece.curr_pos[1]
-        new_move_row, new_move_col = move[0], move[1]
-        prev_val = @grid[new_move_row][new_move_col] # should call dup 
-        @grid[new_move_row][new_move_col] = piece
-        @grid[cur_row][cur_col] = " "
-        legal_moves << move unless in_check?(color)
-        @grid[cur_row][cur_col] = piece
-        @grid[new_move_row][new_move_col] = " "
-      end
+      #debugger
+     legal_moves += piece.legal_moves(self)
     end
-    debugger
     legal_moves
   end
+
+
 
   def is_mate?(color)
     legal_moves(color).empty?
@@ -139,19 +121,49 @@ class Board
     opp_pieces.any? do |piece|
       piece.moves(self).include?(king_pos)
     end
+  end
 
+  def dup
+    new_board = Board.new(false)
+
+    new_board.grid.each_with_index do |row, idx1|
+      row.each_with_index do |tile, idx2|
+
+        if grid[idx1][idx2].class < Piece
+          new_board[[idx1, idx2]] = grid[idx1][idx2].dup(new_board)
+        else
+          new_board[[idx1, idx2]] = grid[idx1][idx2].dup
+        end
+
+      end
+    end
+    new_board
+  end
+
+  def make_any_move(start_pos, end_pos)
+    #take from grid at start move to end pos
+    start_row, start_col = start_pos
+    end_row, end_col = end_pos
+    grid[end_row][end_col] = grid[start_row][start_col]
+    grid[start_row][start_col] = " "
+    grid[end_row][end_col].curr_pos = end_pos
   end
 end
 
 
 
-board = Board.new()
-display = Display.new(board)
+
+# board2 = board.dup
+# display2 = Display.new(board2)
+# display2.navigate
+# board2.make_any_move([6,2], [5,2])
+# display2.navigate
+# display.navigate
 #display.navigate
-p board.in_check?("black")
-p board.in_check?("white")
-p board.is_mate?("black")
-p board.is_mate?("white")
+# p board.in_check?("black")
+# p board.in_check?("white")
+# p board.is_mate?("black")
+# p board.is_mate?("white")
 #display.navigate
 # pawn = Pawn.new('black', board, [4,4])
 # pawn.has_moved = true
