@@ -11,12 +11,11 @@ class King < Piece
   end
 
   def inspect
-    return "K".colorize(:green) if color == 'white'
-    "K"
+    to_s
   end
 
   def to_s
-    return "K".colorize(:green) if color == 'white'
-    "K"
+    return "\u2654".encode("utf-8") if color == 'white'
+    "\u265A".encode('utf-8')
   end
 end

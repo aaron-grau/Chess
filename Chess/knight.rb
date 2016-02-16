@@ -11,12 +11,11 @@ class Knight < Piece
   end
 
   def inspect
-    return "N".colorize(:green) if color == 'white'
-    "N"
+    to_s
   end
 
   def to_s
-    return "N".colorize(:green) if color == 'white'
-    "N"
+    return "\u2658".encode("utf-8") if color == 'white'
+    "\u265E".encode('utf-8')
   end
 end

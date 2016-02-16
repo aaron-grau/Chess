@@ -15,7 +15,7 @@ class Queen < Piece
   end
 
   def to_s
-    return "Q".colorize(:green) if color == 'white'
-    "Q"
+    return "\u2655".encode("utf-8") if color == 'white'
+    "\u265B".encode('utf-8')
   end
 end

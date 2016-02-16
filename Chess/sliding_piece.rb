@@ -33,11 +33,14 @@ module SlidingPiece
           row_c, col_c = row_c + change[0], col_c + change[1]
           pos_new = [pos[0] + row_c, pos[1] + col_c]
         end
-        #need to fix once piece objects are in
-        if @board.in_bounds?(pos_new) && !@board[pos_new].is_a?(String) && @board[pos_new].color != self.color
+
+        if @board.in_bounds?(pos_new) &&
+           !@board[pos_new].is_a?(String) &&
+           @board[pos_new].color != self.color
           new_squares << pos_new
         end
       end
+      
       new_squares
     end
 
