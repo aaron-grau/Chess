@@ -13,12 +13,13 @@ require_relative 'pawn'
 require_relative 'board'
 require_relative 'game'
 require_relative 'human_player'
+require_relative 'computer_player'
 
 require 'colorize'
 require 'byebug'
 
 player1 = HumanPlayer.new("white")
-player2 = HumanPlayer.new("black")
+player2 = ComputerPlayer.new("black")
 
 game = Game.new(player1, player2)
 

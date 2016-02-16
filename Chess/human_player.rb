@@ -6,7 +6,7 @@ class HumanPlayer
 
   def play_turn(board)
     display = Display.new(board, @color)
-    start_pos = display.navigate
+    start_pos = display.navigate([])
     if board.is_empty?(start_pos)
       raise IllegalMoveError.new("You picked an empty square!")
     elsif board[start_pos].color != @color
@@ -14,7 +14,8 @@ class HumanPlayer
     end
 
     board[start_pos].selected = true
-    end_pos = display.navigate
+    legal_moves = board[start_pos].legal_moves(board)
+    end_pos = display.navigate(legal_moves)
     board[start_pos].selected = false
 
     [start_pos, end_pos]

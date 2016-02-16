@@ -115,6 +115,7 @@ class Board
     start,end_pos = pos
     start_row, start_col = start
     end_row, end_col = end_pos
+    #debugger
     start_piece = @grid[start_row][start_col]
 
     legal_move?(start,end_pos)
