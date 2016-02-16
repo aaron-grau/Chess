@@ -11,8 +11,10 @@ class Game
       begin
         board.move(@curr_player.play_turn(board))
       rescue IllegalMoveError => e
-        p e.message
-        sleep(2)
+        if @curr_player.is_a?(HumanPlayer)
+          p e.message
+          sleep(2)
+        end
         retry
       end
       if board.in_check?('white') || board.in_check?('black')
@@ -21,7 +23,7 @@ class Game
       switch_player
     end
     display = Display.new(board)
-    display.render
+    display.render([])
     print "Check Mate!" if board.is_mate?("black") || board.is_mate?("white")
   end
 
