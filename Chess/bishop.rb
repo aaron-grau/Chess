@@ -15,7 +15,7 @@ class Bishop < Piece
   end
 
   def to_s
-    return "B".colorize(:green) if color == 'white'
-    "B"
+    return "\u2657".encode("utf-8") if color == 'white'
+    "\u265D".encode('utf-8')
   end
 end

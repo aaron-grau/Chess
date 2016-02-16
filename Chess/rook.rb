@@ -13,9 +13,9 @@ class Rook < Piece
   def inspect
     to_s
   end
-  
+
   def to_s
-    return "R".colorize(:green) if color == 'white'
-    "R"
+    return "\u2656".encode("utf-8") if color == 'white'
+    "\u265C".encode('utf-8')
   end
 end
