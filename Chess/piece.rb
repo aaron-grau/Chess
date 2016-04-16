@@ -18,14 +18,31 @@ class Piece
     all_moves = moves(board)
 
     all_moves.reject do |move|
-      test_board = board.dup
-      test_board.make_any_move(@curr_pos, move)
-      test_board.in_check?(color)
+      save_move(move)
+      @board.make_any_move(@curr_pos, move)
+      flag = @board.in_check?(color)
+      undo_move
+
+      flag
     end
   end
 
   def dup(new_board)
     self.class.new(color, new_board, curr_pos)
+  end
+
+
+  private
+
+  def save_move(end_pos)
+    end_row, end_col = end_pos
+    @last_captured = @board.grid[end_row][end_col]
+    @reverse_move  = [end_pos, @curr_pos]
+  end
+
+  def undo_move
+    @board.make_any_move(@reverse_move[0], @reverse_move[1])
+    @board.grid[@reverse_move[0][0]][@reverse_move[0][1]] = @last_captured
   end
 
 

@@ -13,7 +13,6 @@ class Game
       rescue IllegalMoveError => e
         if @curr_player.is_a?(HumanPlayer)
           p e.message
-          sleep(2)
         end
         retry
       end
