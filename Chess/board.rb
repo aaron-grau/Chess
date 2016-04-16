@@ -1,6 +1,6 @@
 class Board
 
-  attr_reader :grid
+  attr_accessor :grid
 
   BLACK_PIECES = [
     Rook.new("black", self, [0,0]),
@@ -58,6 +58,7 @@ class Board
     start_row, start_col = start
     end_row, end_col = end_pos
     piece = grid[start_row][start_col]
+
     unless piece.legal_moves(self).include?(end_pos)
       raise IllegalMoveError.new("Illegal Move!")
     end
@@ -69,12 +70,19 @@ class Board
 
   def in_check?(color)
     king_pos = []
-    @grid.flatten.each do |tile|
-      king_pos = tile.curr_pos if tile.is_a?(King) && tile.color == color
+    @grid.each do |row|
+      row.each do |tile|
+        king_pos = tile.curr_pos if tile.is_a?(King) && tile.color == color
+      end
     end
-    opp_pieces = @grid.flatten.select { |tile| tile.class < Piece && tile.color != color }
 
-      #debugger
+    opp_pieces = []
+    @grid.each do |row|
+      row.each do |tile|
+        opp_pieces << tile if tile.class < Piece && tile.color != color
+      end
+    end
+
     opp_pieces.any? do |piece|
       piece.moves(self).include?(king_pos)
     end
@@ -91,19 +99,38 @@ class Board
 
   def legal_moves(color)
     legal_moves = []
+
     pieces =
       @grid.flatten.select do |tile|
         tile.class < Piece && tile.color == color
       end
+
     pieces.each do |piece|
-      #debugger
      legal_moves += piece.legal_moves(self)
     end
+
+    legal_moves
+  end
+
+  def legal_moves_with_start(color)
+    legal_moves = []
+
+    pieces =
+      @grid.flatten.select do |tile|
+        tile.class < Piece && tile.color == color
+      end
+
+    pieces.each do |piece|
+       piece_legal_moves = piece.legal_moves(self)
+       piece_legal_moves.each do |target|
+         legal_moves << [piece.curr_pos, target]
+       end
+    end
+
     legal_moves
   end
 
   def make_any_move(start_pos, end_pos)
-    #take from grid at start move to end pos
     start_row, start_col = start_pos
     end_row, end_col = end_pos
     grid[end_row][end_col] = grid[start_row][start_col]
@@ -115,9 +142,7 @@ class Board
     start,end_pos = pos
     start_row, start_col = start
     end_row, end_col = end_pos
-    #debugger
     start_piece = @grid[start_row][start_col]
-
     legal_move?(start,end_pos)
     @grid[end_row][end_col] = start_piece
     @grid[start_row][start_col] = " "

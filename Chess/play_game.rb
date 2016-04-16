@@ -1,3 +1,4 @@
+
 require_relative 'string'
 require_relative 'illegal_move_error'
 require_relative "display"
@@ -11,6 +12,7 @@ require_relative 'queen'
 require_relative 'rook'
 require_relative 'pawn'
 require_relative 'board'
+require_relative 'node'
 require_relative 'game'
 require_relative 'human_player'
 require_relative 'computer_player'
