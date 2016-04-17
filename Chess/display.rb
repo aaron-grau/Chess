@@ -12,7 +12,6 @@ class Display
   end
 
   def render(legal_moves)
-    system('clear')
     @board.grid.each_with_index do |row, idx1|
 
       row.each_with_index do |tile, idx2|

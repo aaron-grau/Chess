@@ -40,7 +40,7 @@ module SlidingPiece
           new_squares << pos_new
         end
       end
-      
+
       new_squares
     end
 

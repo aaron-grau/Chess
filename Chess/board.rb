@@ -1,3 +1,5 @@
+require 'benchmark'
+
 class Board
 
   attr_accessor :grid
@@ -115,18 +117,18 @@ class Board
   def legal_moves_with_start(color)
     legal_moves = []
 
-    pieces =
-      @grid.flatten.select do |tile|
-        tile.class < Piece && tile.color == color
-      end
+    pieces = []
 
-    pieces.each do |piece|
-       piece_legal_moves = piece.legal_moves(self)
-       piece_legal_moves.each do |target|
-         legal_moves << [piece.curr_pos, target]
-       end
+    @grid.each do |row|
+      row.each do |tile|
+        pieces << tile if tile.class < Piece && tile.color == color
+      end
     end
 
+    pieces.each do |piece|
+       legal_moves << piece.legal_moves_cur_pos(self)
+    end
+    legal_moves.flatten!(1)
     legal_moves
   end
 
@@ -136,6 +138,7 @@ class Board
     grid[end_row][end_col] = grid[start_row][start_col]
     grid[start_row][start_col] = " "
     grid[end_row][end_col].curr_pos = end_pos
+    promote_pawns
   end
 
   def move(pos)
@@ -147,6 +150,7 @@ class Board
     @grid[end_row][end_col] = start_piece
     @grid[start_row][start_col] = " "
     start_piece.curr_pos = end_pos
+    promote_pawns
   end
 
   private
@@ -171,4 +175,16 @@ class Board
     end
   end
 
+  def promote_pawns
+    @grid[0].each do |tile|
+      if tile.class === Pawn
+        tile = Queen.new(tile.color, self, tile.cur_pos)
+      end
+    end
+    @grid[7].each do |tile|
+      if tile.class == Pawn
+        tile = Queen.new(tile.color, self, tile.cur_pos)
+      end
+    end
+  end
 end

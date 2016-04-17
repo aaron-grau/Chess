@@ -1,3 +1,4 @@
+require 'benchmark'
 class Piece
   attr_reader :color
   attr_accessor :selected, :curr_pos
@@ -25,6 +26,28 @@ class Piece
 
       flag
     end
+  end
+
+  def legal_moves_cur_pos(board)
+    all_moves = nil;
+    all_moves = moves(board)
+
+    all_moves.delete_if do |move|
+      save_move(move)
+      @board.make_any_move(@curr_pos, move)
+      flag = @board.in_check?(color)
+      undo_move
+      unless flag
+        old_move = move.dup
+        move.delete_at(0)
+        move.delete_at(0)
+        move << @curr_pos
+        move << old_move
+      end
+      flag
+    end
+
+    all_moves
   end
 
   def dup(new_board)

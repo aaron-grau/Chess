@@ -1,3 +1,5 @@
+require 'benchmark'
+
 class Node
 
   VALUES = {
@@ -17,12 +19,13 @@ class Node
   end
 
 
-  def alpha_beta(ply, alpha, beta, counter = {count: 0})
+  def alpha_beta(ply, alpha, beta, counter)
+
     return evaluate_pos if ply == 0
     #dont check for mate unless position is check to avoid more expensive comp
     return -1000 if @board.in_check?(@color) && @board.is_mate?(@color)
 
-
+    counter[:count] += 1
     legalMoves = @board.legal_moves_with_start(@color)
     sort_by_captures(legalMoves)
 
@@ -76,18 +79,21 @@ class Node
     end
 
 
-    (evaluate_pieces(pieces) - evaluate_pieces(opp_pieces)) + development(pieces)
+    total_evaluation = (evaluate_pieces(pieces) - evaluate_pieces(opp_pieces))
+      + development(pieces, @color)
+
+    total_evaluation
   end
 
-  def development(pieces)
+  def development(pieces, color)
     val = 0
-    if (@color == COLORS[0])
+    if (color == COLORS[0])
       pieces.each do |piece|
-        val += 0.01 if piece.curr_pos[0] < 6
+        val += 0.1 if piece.curr_pos[0] < 6
       end
     else
       pieces.each do |piece|
-        val += 0.01 if piece.curr_pos[0] > 1
+        val += 0.1 if piece.curr_pos[0] > 1
       end
     end
 
