@@ -3,6 +3,7 @@ class Rook < Piece
 
   def initialize(color = "white",board, curr_pos)
     super(color, board, curr_pos)
+    @can_castle = true
   end
 
   def moves(board)

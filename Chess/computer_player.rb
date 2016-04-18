@@ -44,8 +44,12 @@ class ComputerPlayer
       end
       captures = sort_by_captures(moves)
       captures.each do |move|
+        @castle = false
+        @queened = false
         save_move(move)
-        @board.make_any_move(move[0], move[1])
+        special_move = @board.make_any_move(move[0], move[1])
+        @queened = special_move == "queened"
+        @k_castle = special_move == "k_castled"
         if @board.is_mate?(@opp_color)
           undo_move
           return move
@@ -64,8 +68,12 @@ class ComputerPlayer
     end
 
     @non_captures.each do |move|
+      @castle = false
+      @queened = false
       save_move(move)
-      @board.make_any_move(move[0], move[1])
+      special_move = @board.make_any_move(move[0], move[1])
+      @queened = special_move == "queened"
+      @k_castle = special_move == "k_castled"
       if @board.is_mate?(@opp_color)
         undo_move
         return move
@@ -89,15 +97,25 @@ class ComputerPlayer
   end
 
   def save_move(move)
+    @disabled_castling = false
     start, end_pos = move
     end_row, end_col = end_pos
     @last_captured = @board.grid[end_row][end_col]
     @reverse_move  = [end_pos, start]
+    @disabled_castling = true if @board[move[0]].can_castle
   end
 
   def undo_move
+    @board[@reverse_move[0]].can_castle = true if @disabled_castling
     @board.make_any_move(@reverse_move[0], @reverse_move[1])
     @board.grid[@reverse_move[0][0]][@reverse_move[0][1]] = @last_captured
+    if @queened
+      @board[@reverse_move[1]] = Pawn.new(@color, @board, @reverse_move[1])
+    end
+    if @k_castled
+      @board[@reverse_move[1]].has_castled = false
+      @board.make_any_move([@curr_pos[0], @curr_pos + 1], [@curr_pos[0], @curr_pos + 3])
+    end
   end
 
   def depth

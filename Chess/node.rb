@@ -1,5 +1,5 @@
 require 'byebug'
-require 'Benchmark'
+
 class Node
 
   VALUES = {
@@ -46,8 +46,12 @@ class Node
         save_move(move)
         new_ply = ply - 1
         #do extra plies until 5 depth for lines ending with captures
-        new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 6
-        @board.make_any_move(move[0], move[1])
+        new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 5
+        @castle = false
+        @queened = false
+        special_move = @board.make_any_move(move[0], move[1])
+        @queened = special_move == "queened"
+        @k_castle = special_move == "k_castled"
         new_node = Node.new(@board, @opp_color, @color)
         cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
         undo_move
@@ -62,9 +66,13 @@ class Node
     @non_captures.each do |move|
       save_move(move)
       new_ply = ply - 1
-      #do extra plies until 5 depth for lines ending with captures
-      new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 6
-      @board.make_any_move(move[0], move[1])
+      #do extra plies until 4 depth for lines ending with captures
+      new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 5
+      @castle = false
+      @queened = false
+      special_move = @board.make_any_move(move[0], move[1])
+      @queened = special_move == "queened"
+      @k_castle = special_move == "k_castled"
       new_node = Node.new(@board, @opp_color, @color)
       cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
       undo_move
@@ -82,15 +90,25 @@ class Node
   private
 
   def save_move(move)
+    @disabled_castling = false
     start, end_pos = move
     end_row, end_col = end_pos
     @last_captured = @board.grid[end_row][end_col]
     @reverse_move  = [end_pos, start]
+    @disabled_castling = true if @board[move[0]].can_castle
   end
 
   def undo_move
+    @board[@reverse_move[0]].can_castle = true if @disabled_castling
     @board.make_any_move(@reverse_move[0], @reverse_move[1])
     @board.grid[@reverse_move[0][0]][@reverse_move[0][1]] = @last_captured
+    if @queened
+      @board[@reverse_move[1]] = Pawn.new(@color, @board, @reverse_move[1])
+    end
+    if @k_castled
+      @board[@reverse_move[1]].has_castled = false
+      @board.make_any_move([@curr_pos[0], @curr_pos + 1], [@curr_pos[0], @curr_pos + 3])
+    end
   end
 
   def evaluate_pos
@@ -123,6 +141,7 @@ class Node
         #value pawn advancement different than normal developmenet
         if piece.class == Pawn
           val += 0.005 * (6 - piece.curr_pos[0]).abs
+          val += 0.2 if piece.curr_pos[0] == 1 || piece.curr_pos[0] == 2
         elsif !(piece.class == Queen) && !(piece.class == King)
           val += 0.25 if piece.curr_pos[0] < 6
         elsif piece.class == Queen
@@ -142,6 +161,7 @@ class Node
       pieces.each do |piece|
         if piece.class == Pawn
           val += 0.005 * (piece.curr_pos[0] - 1)
+          val += 0.2 if piece.curr_pos[0] == 6 || piece.curr_pos[0] == 5
         elsif !(piece.class == Queen) && !(piece.class == King)
           val += 0.2 if piece.curr_pos[0] > 1
         elsif piece.class == Queen

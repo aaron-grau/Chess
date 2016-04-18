@@ -61,7 +61,6 @@ class Board
     end_row, end_col = end_pos
     piece = grid[start_row][start_col]
 
-    debugger if piece == " "
     unless piece.legal_moves(self).include?(end_pos)
       raise IllegalMoveError.new("Illegal Move!")
     end
@@ -154,13 +153,30 @@ class Board
     start_row, start_col = start_pos
     end_row, end_col = end_pos
     start_piece = @grid[start_row][start_col]
-    grid[end_row][end_col] = grid[start_row][start_col]
-    grid[start_row][start_col] = " "
-    grid[end_row][end_col].curr_pos = end_pos
-    # if start_piece.class == Pawn && (end_row == 0 || end_row == 7)
-    #   grid[end_row][end_col] == Queen.new(start_piece.color, self, end_pos)
-    #   return "queened"
-    # end
+    if start_piece.class == Rook
+       start_piece.can_castle = false
+    end
+    if start_piece.class == King
+      start_piece.can_castle = false
+      if end_col == 6 && start_col ==
+        rook = @grid[start_row][start_col + 3]
+        @grid[start_row][start_col + 3] = " "
+        @grid[starrt_row][start_col + 1] = rook
+        rook.curr_pos = [start_row, start_col + 1]
+        start_piece.has_castled = true
+        @grid[end_row][end_col] = @grid[start_row][start_col]
+        @grid[start_row][start_col] = " "
+        start_piece.curr_pos = end_pos
+        return "k_castled"
+      end
+    end
+    @grid[end_row][end_col] = @grid[start_row][start_col]
+    @grid[start_row][start_col] = " "
+
+    if start_piece.class == Pawn && (end_row == 0 || end_row == 7)
+      @grid[end_row][end_col] = Queen.new(start_piece.color, self, end_pos)
+      return "queened"
+    end
     start_piece.curr_pos = end_pos
     return nil
   end
@@ -170,14 +186,33 @@ class Board
     start_row, start_col = start
     end_row, end_col = end_pos
     start_piece = @grid[start_row][start_col]
+    if start_piece.class == Rook
+      start_piece.can_castle = false
+    end
+    if start_piece.class == King
+      start_piece.can_castle = false
+      if end_col - start_col == 2
+        rook = @grid[start_row][start_col + 3]
+        @grid[start_row][start_col + 3] = " "
+        @grid[start_row][start_col + 1] = rook
+        rook.curr_pos = [start_row, start_col + 1]
+        start_piece.has_castled = true
+        @grid[end_row][end_col] = @grid[start_row][start_col]
+        @grid[start_row][start_col] = " "
+        start_piece.curr_pos = end_pos
+        return "k_castled"
+      end
+    end
     legal_move?(start, end_pos)
 
     @grid[end_row][end_col] = start_piece
     @grid[start_row][start_col] = " "
-    # if start_piece.class == Pawn && (end_row == 0 || end_row == 7)
-    #   grid[end_row][end_col] == Queen.new(start_piece.color, self, end_pos)
-    #   return "queened"
-    # end
+
+    if start_piece.class == Pawn && (end_row == 0 || end_row == 7)
+      @grid[end_row][end_col] = Queen.new(start_piece.color, self, end_pos)
+      return "queened"
+    end
+
     start_piece.curr_pos = end_pos
   end
 
