@@ -16,10 +16,10 @@ class King < Piece
     #king side castling legality check
     if @can_castle && @board[[@curr_pos[0], @curr_pos[1] + 3]].can_castle &&
       @board.is_empty?([@curr_pos[0], @curr_pos[1] + 1]) &&
-      @board.is_empty?([@curr_pos[0], @curr_pos[1] + 2]) &&
-      !@board.in_check?(@color)
+      @board.is_empty?([@curr_pos[0], @curr_pos[1] + 2])
       moves << [@curr_pos[0], @curr_pos[1] + 2]
     end
+    #queen side castling legality check
 
     moves
   end
