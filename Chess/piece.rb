@@ -1,6 +1,6 @@
 class Piece
   attr_reader :color
-  attr_accessor :selected, :curr_pos
+  attr_accessor :selected, :curr_pos, :board
 
   def initialize(color = 'white', board, curr_pos)
     @color, @board, @curr_pos, @selected = color, board, curr_pos, false
@@ -26,6 +26,7 @@ class Piece
       flag
     end
   end
+
 
   def dup(new_board)
     self.class.new(color, new_board, curr_pos)

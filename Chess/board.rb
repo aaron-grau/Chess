@@ -26,6 +26,8 @@ class Board
   def initialize(new_set = true)
     @grid = Array.new(8){Array.new(8){" "}}
     set_board if new_set
+    @w_king = @grid[7][4]
+    @b_king = @grid[0][4]
   end
 
   def [](pos)
@@ -69,12 +71,7 @@ class Board
   end
 
   def in_check?(color)
-    king_pos = []
-    @grid.each do |row|
-      row.each do |tile|
-        king_pos = tile.curr_pos if tile.is_a?(King) && tile.color == color
-      end
-    end
+    king_pos = color == "white" ? @w_king.curr_pos : @b_king.curr_pos
 
     opp_pieces = []
     @grid.each do |row|
@@ -90,7 +87,7 @@ class Board
 
   def is_empty?(pos)
     row, col = pos
-    @grid[row][col] == " " || !in_bounds?(pos)
+    !in_bounds?(pos) || @grid[row][col] == " "
   end
 
   def is_mate?(color)
@@ -112,6 +109,25 @@ class Board
     legal_moves
   end
 
+  def all_moves_with_start(color)
+    all_moves = []
+
+    pieces =
+      @grid.flatten.select do |tile|
+        tile.class < Piece && tile.color == color
+      end
+
+    pieces.each do |piece|
+       piece_moves = piece.moves(self)
+
+       piece_moves.each do |target|
+         all_moves << [piece.curr_pos, target]
+       end
+    end
+
+    all_moves
+  end
+
   def legal_moves_with_start(color)
     legal_moves = []
 
@@ -121,8 +137,9 @@ class Board
       end
 
     pieces.each do |piece|
-       piece_legal_moves = piece.legal_moves(self)
-       piece_legal_moves.each do |target|
+       piece_moves = piece.legal_moves(self)
+
+       piece_moves.each do |target|
          legal_moves << [piece.curr_pos, target]
        end
     end
@@ -133,9 +150,11 @@ class Board
   def make_any_move(start_pos, end_pos)
     start_row, start_col = start_pos
     end_row, end_col = end_pos
+    start_piece = @grid[start_row][start_col]
     grid[end_row][end_col] = grid[start_row][start_col]
     grid[start_row][start_col] = " "
     grid[end_row][end_col].curr_pos = end_pos
+    start_piece.curr_pos = end_pos
   end
 
   def move(pos)

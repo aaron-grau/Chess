@@ -1,0 +1,6 @@
+1.2122036423534155e-05 -> evaluate pieces
+.005 -> find moves 2751 calls  12 seconds 95% of time …
+
+sunday:
+1. add castling and promotion, allow undoing of both of these move. 
+2. DONE! try to make find move happen in reasonable amount of time
