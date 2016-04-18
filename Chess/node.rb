@@ -1,3 +1,4 @@
+require 'byebug'
 class Node
 
   VALUES = {
@@ -6,7 +7,7 @@ class Node
    Bishop => 3,
    Rook => 5,
    Queen => 9,
-   King => 100 #just filler so computation doesnt crash king can never be captutred would hit mate first
+   King => 10000
   }
 
   COLORS = ["white", "black"]
@@ -22,24 +23,19 @@ class Node
     #dont check for mate unless position is check to avoid more expensive comp
     return -1000 if @board.in_check?(@color) && @board.is_mate?(@color)
 
+    moves = @board.all_moves_with_start(@color)
+    sort_by_captures(moves)
 
-    legalMoves = @board.legal_moves_with_start(@color)
-    sort_by_captures(legalMoves)
-
-    legalMoves.each do |move|
+    moves.each do |move|
       save_move(move)
       @board.make_any_move(move[0], move[1])
       new_node = Node.new(@board, @opp_color, @color)
       cur_eval = -1 * new_node.alpha_beta(ply - 1, -beta, -alpha, counter)
       undo_move
 
-      #found mate stop searching this line for something better
-      return cur_eval if cur_eval == 1000
-
       return beta if cur_eval >= beta
 
       alpha = cur_eval if cur_eval > alpha
-
     end
 
     return alpha;
@@ -60,7 +56,6 @@ class Node
   end
 
   def evaluate_pos
-
     pieces = []
     @board.grid.each do |row|
       row.each do |square|
@@ -76,18 +71,47 @@ class Node
     end
 
 
-    (evaluate_pieces(pieces) - evaluate_pieces(opp_pieces)) + development(pieces)
+    piece_eval = evaluate_pieces(pieces) - evaluate_pieces(opp_pieces)
+    development_eval = development(pieces, @color) - development(opp_pieces, @opp_color)
+
+
+    piece_eval + development_eval
   end
 
-  def development(pieces)
+  def development(pieces, color)
     val = 0
-    if (@color == COLORS[0])
+    if (color == COLORS[0])
       pieces.each do |piece|
-        val += 0.01 if piece.curr_pos[0] < 6
+        #value pawn advancement different than normal developmenet
+        if piece.class == Pawn
+          val += 0.005 * (6 - piece.curr_pos[0]).abs
+        elsif (!(piece.class == Queen) && !(piece.class == King))
+          val += 0.25 if piece.curr_pos[0] < 6
+        end
+        #king on back rank bonus on crowded board
+        if piece.class == King
+          val += 0.25 if pieces.length > 9 && piece.curr_pos[0] == 7
+        else
+          #centralized pieces bonus
+          if piece.curr_pos[0] < 6 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
+            val += 0.05
+          end
+        end
       end
     else
       pieces.each do |piece|
-        val += 0.01 if piece.curr_pos[0] > 1
+        if piece.class == Pawn
+          val += 0.005 * (piece.curr_pos[0] - 1)
+        elsif (!(piece.class == Queen) && !(piece.class == King))
+          val += 0.2 if piece.curr_pos[0] > 1
+        end
+        if piece.class == King
+          val += 0.25 if pieces.length > 9 && piece.curr_pos[0] == 0
+        else
+          if piece.curr_pos[0] > 1 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
+            val += 0.05
+          end
+        end
       end
     end
 

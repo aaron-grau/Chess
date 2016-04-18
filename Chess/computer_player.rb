@@ -23,22 +23,28 @@ class ComputerPlayer
   def find_best_move
     best_move = nil
     best_eval = nil
+    alpha = -100000
+    beta = 100000
+    moves = @board.legal_moves_with_start(@color)
+    sort_by_captures(moves)
 
-    @board.legal_moves_with_start(@color).each do |move|
+    moves.each do |move|
       save_move(move)
       @board.make_any_move(move[0], move[1])
-      cur_node = Node.new(@board, @opp_color, @color)
-      cur_eval = -1 * cur_node.alpha_beta(2, -10000, 10000)
-      undo_move
       #found mate in one dont check any other moves
-      return move if cur_eval == 1000
+      return move if @board.in_check?(@opp_color) && @board.is_mate?(@opp_color)
 
-      if best_move.nil? || cur_eval > best_eval
+      cur_node = Node.new(@board, @opp_color, @color)
+      cur_eval = -1 * cur_node.alpha_beta(depth, -beta, -alpha)
+      undo_move
+
+      if cur_eval > alpha
         best_move = move
-        best_eval = cur_eval
+        alpha = cur_eval
       end
     end
-    p best_eval
+    p "best_eval #{alpha}"
+
     best_move
   end
 
@@ -52,6 +58,28 @@ class ComputerPlayer
   def undo_move
     @board.make_any_move(@reverse_move[0], @reverse_move[1])
     @board.grid[@reverse_move[0][0]][@reverse_move[0][1]] = @last_captured
+  end
+
+  def depth
+    pieces = 0
+    @board.grid.each do |row|
+      row.each do |tile|
+        pieces += 1 if tile.class < Piece
+      end
+    end
+
+    depth = 3
+    depth = 4 if pieces < 10
+    depth = 6 if pieces < 6
+    depth = 8 if pieces < 4
+
+    depth
+  end
+
+  def sort_by_captures(moves)
+    moves.each_with_index do |move, idx|
+      moves.unshift(moves.delete_at(idx)) if @board[move[1]].class < Piece
+    end
   end
 
 
