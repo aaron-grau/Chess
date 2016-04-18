@@ -1,4 +1,5 @@
 require 'byebug'
+require 'Benchmark'
 class Node
 
   VALUES = {
@@ -18,10 +19,10 @@ class Node
   end
 
 
-  def alpha_beta(ply, alpha, beta, cur_depth)
+  def alpha_beta(ply, alpha, beta, cur_depth, counter)
+    counter[:count] += 1
     return evaluate_pos if ply == 0
 
-    return -1000 if @board.is_mate?(@color)
 
     pieces = []
 
@@ -31,27 +32,48 @@ class Node
       end
     end
 
+    @non_captures = []
+
     pieces.each do |piece|
       moves = []
+      piece_moves = []
       piece_moves = piece.moves(@board)
       piece_moves.each do |target|
         moves << [piece.curr_pos, target]
       end
-      sort_by_captures(moves)
-      moves.each do |move|
+      captures = sort_by_captures(moves)
+      captures.each do |move|
         save_move(move)
         new_ply = ply - 1
-        #do extra plies until 4 depth for lines ending with captures
-        new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 5
+        #do extra plies until 5 depth for lines ending with captures
+        new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 6
         @board.make_any_move(move[0], move[1])
         new_node = Node.new(@board, @opp_color, @color)
-        cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1)
+        cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
         undo_move
 
         return beta if cur_eval >= beta
 
         alpha = cur_eval if cur_eval > alpha
+        return alpha if alpha > 1000
       end
+    end
+
+    @non_captures.each do |move|
+      save_move(move)
+      new_ply = ply - 1
+      #do extra plies until 5 depth for lines ending with captures
+      new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 6
+      @board.make_any_move(move[0], move[1])
+      new_node = Node.new(@board, @opp_color, @color)
+      cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
+      undo_move
+
+      return beta if cur_eval >= beta
+
+      alpha = cur_eval if cur_eval > alpha
+
+      return alpha if alpha > 1000
     end
 
     return alpha;
@@ -101,8 +123,10 @@ class Node
         #value pawn advancement different than normal developmenet
         if piece.class == Pawn
           val += 0.005 * (6 - piece.curr_pos[0]).abs
-        elsif (!(piece.class == Queen) && !(piece.class == King))
+        elsif !(piece.class == Queen) && !(piece.class == King)
           val += 0.25 if piece.curr_pos[0] < 6
+        elsif piece.class == Queen
+          val += 0.1 if piece.curr_pos[0] < 6
         end
         #king on back rank bonus on crowded board
         if piece.class == King
@@ -118,8 +142,10 @@ class Node
       pieces.each do |piece|
         if piece.class == Pawn
           val += 0.005 * (piece.curr_pos[0] - 1)
-        elsif (!(piece.class == Queen) && !(piece.class == King))
+        elsif !(piece.class == Queen) && !(piece.class == King)
           val += 0.2 if piece.curr_pos[0] > 1
+        elsif piece.class == Queen
+          val += 0.1 if piece.curr_pos[0] > 1
         end
         if piece.class == King
           val += 0.25 if pieces.length > 9 && piece.curr_pos[0] == 0
@@ -145,9 +171,18 @@ class Node
   end
 
   def sort_by_captures(moves)
+    captures = []
+    non_captures = []
+
     moves.each_with_index do |move, idx|
-      moves.unshift(moves.delete_at(idx)) if @board[move[1]].class < Piece
+      if @board[move[1]].class < Piece
+        captures << move
+      else
+        @non_captures << move
+      end
     end
+
+    captures
   end
 
 
