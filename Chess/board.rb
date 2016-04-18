@@ -170,6 +170,17 @@ class Board
         start_piece.curr_pos = end_pos
         start_piece.can_castle = false
         return "k_castled"
+      elsif end_col == 2 && start_col == 4
+        rook = @grid[start_row][start_col - 4]
+        @grid[start_row][start_col - 4] = " "
+        @grid[start_row][start_col - 1] = rook
+        rook.curr_pos = [start_row, start_col - 1]
+        start_piece.has_castled = true
+        @grid[end_row][end_col] = @grid[start_row][start_col]
+        @grid[start_row][start_col] = " "
+        start_piece.curr_pos = end_pos
+        start_piece.can_castle = false
+        return "q_castled"
       else
         start_piece.can_castle = false
       end
@@ -181,6 +192,7 @@ class Board
       @grid[end_row][end_col] = Queen.new(start_piece.color, self, end_pos)
       return "queened"
     end
+    debugger if start_piece == " "
     start_piece.curr_pos = end_pos
     return nil
   end
@@ -205,6 +217,17 @@ class Board
         start_piece.curr_pos = end_pos
         start_piece.can_castle = false
         return "k_castled"
+      elsif end_col == 2 && start_col == 4
+        rook = @grid[start_row][start_col - 4]
+        @grid[start_row][start_col - 4] = " "
+        @grid[start_row][start_col - 1] = rook
+        rook.curr_pos = [start_row, start_col - 1]
+        start_piece.has_castled = true
+        @grid[end_row][end_col] = @grid[start_row][start_col]
+        @grid[start_row][start_col] = " "
+        start_piece.curr_pos = end_pos
+        start_piece.can_castle = false
+        return "q_castled"
       else
         start_piece.can_castle = false
       end

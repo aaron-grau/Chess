@@ -25,6 +25,7 @@ class Piece
       special_move = @board.make_any_move(@curr_pos, move)
       @queened = special_move == "queened"
       @k_castled = special_move == "k_castled"
+      @q_castled = special_move == "q_castled"
       flag = @board.in_check?(color)
       undo_move
 
@@ -59,6 +60,12 @@ class Piece
       @board.make_any_move([@curr_pos[0], @curr_pos[1] + 1], [@curr_pos[0], @curr_pos[1] + 3])
       @board[[@curr_pos[0], @curr_pos[1] + 3]].can_castle = true
     end
+    if @q_castled
+      @has_castled = false
+      @board.make_any_move([@curr_pos[0], @curr_pos[1] - 1], [@curr_pos[0], @curr_pos[1] - 4])
+      @board[[@curr_pos[0], @curr_pos[1] - 4]].can_castle = true
+    end
+
     @can_castle = true if @disabled_castling
   end
 

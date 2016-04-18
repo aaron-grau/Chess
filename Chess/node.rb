@@ -52,6 +52,7 @@ class Node
         special_move = @board.make_any_move(move[0], move[1])
         @queened = special_move == "queened"
         @k_castled = special_move == "k_castled"
+        @q_castled = special_move == "q_castled"
         new_node = Node.new(@board, @opp_color, @color)
         cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
         undo_move
@@ -73,6 +74,7 @@ class Node
       special_move = @board.make_any_move(move[0], move[1])
       @queened = special_move == "queened"
       @k_castled = special_move == "k_castled"
+      @q_castled = special_move == "q_castled"
       new_node = Node.new(@board, @opp_color, @color)
       cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
       undo_move
@@ -95,7 +97,7 @@ class Node
     end_row, end_col = end_pos
     @last_captured = @board.grid[end_row][end_col]
     @reverse_move  = [end_pos, start]
-    debugger if @board[start] == " "
+
     @disabled_castling = true if @board[start].can_castle
   end
 
@@ -110,6 +112,11 @@ class Node
     if @k_castled
       @board.make_any_move([curr_pos[0], curr_pos[1] + 1], [curr_pos[0], curr_pos[1] + 3])
       @board[[curr_pos[0], curr_pos[1] + 3]].can_castle = true
+      @board[@reverse_move[1]].has_castled = false
+    end
+    if @q_castled
+      @board.make_any_move([curr_pos[0], curr_pos[1] - 1], [curr_pos[0], curr_pos[1] - 4])
+      @board[[curr_pos[0], curr_pos[1] - 4]].can_castle = true
       @board[@reverse_move[1]].has_castled = false
     end
     @board[@reverse_move[1]].can_castle = true if @disabled_castling
