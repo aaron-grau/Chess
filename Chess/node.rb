@@ -11,6 +11,14 @@ class Node
    King => 10000
   }
 
+  DEVELOPMENT = {
+    pawn_push: 0.005,
+    piece_out: 0.25,
+    queen_out: 0.1,
+    king_back: 0.25,
+    centralized: 0.05
+  }
+
   COLORS = ["white", "black"]
   def initialize(board, color, opp_color)
     @board = board
@@ -46,7 +54,7 @@ class Node
         save_move(move)
         new_ply = ply - 1
         #do extra plies until 5 depth for lines ending with captures
-        new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 6
+        new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 5
         @board.make_any_move(move[0], move[1])
         new_node = Node.new(@board, @opp_color, @color)
         cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
@@ -55,7 +63,6 @@ class Node
         return beta if cur_eval >= beta
 
         alpha = cur_eval if cur_eval > alpha
-        return alpha if alpha > 1000
       end
     end
 
@@ -72,8 +79,6 @@ class Node
       return beta if cur_eval >= beta
 
       alpha = cur_eval if cur_eval > alpha
-
-      return alpha if alpha > 1000
     end
 
     return alpha;
@@ -122,37 +127,33 @@ class Node
       pieces.each do |piece|
         #value pawn advancement different than normal developmenet
         if piece.class == Pawn
-          val += 0.005 * (6 - piece.curr_pos[0]).abs
+          val += DEVELOPMENT[:pawn_push] * (6 - piece.curr_pos[0]).abs
         elsif !(piece.class == Queen) && !(piece.class == King)
-          val += 0.25 if piece.curr_pos[0] < 6
+          val += DEVELOPMENT[:piece_out] if piece.curr_pos[0] < 6
         elsif piece.class == Queen
-          val += 0.1 if piece.curr_pos[0] < 6
+          val += DEVELOPMENT[:queen_out]
         end
         #king on back rank bonus on crowded board
         if piece.class == King
-          val += 0.25 if pieces.length > 9 && piece.curr_pos[0] == 7
-        else
+          val += DEVELOPMENT[:king_back] if pieces.length > 9 && piece.curr_pos[0] == 7
+        elsif piece.curr_pos[0] < 6 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
           #centralized pieces bonus
-          if piece.curr_pos[0] < 6 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
-            val += 0.05
-          end
+          val += DEVELOPMENT[:centralized]
         end
       end
     else
       pieces.each do |piece|
         if piece.class == Pawn
-          val += 0.005 * (piece.curr_pos[0] - 1)
-        elsif !(piece.class == Queen) && !(piece.class == King)
-          val += 0.2 if piece.curr_pos[0] > 1
+          val += DEVELOPMENT[:pawn_push] * (piece.curr_pos[0] - 1)
+        elsif (!(piece.class == Queen) && !(piece.class == King))
+          val += DEVELOPMENT[:piece_out] if piece.curr_pos[0] > 1
         elsif piece.class == Queen
-          val += 0.1 if piece.curr_pos[0] > 1
+          val += DEVELOPMENT[:queen_out]
         end
         if piece.class == King
-          val += 0.25 if pieces.length > 9 && piece.curr_pos[0] == 0
-        else
-          if piece.curr_pos[0] > 1 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
-            val += 0.05
-          end
+          val += DEVELOPMENT[:king_back] if pieces.length > 9 && piece.curr_pos[0] == 0
+        elsif piece.curr_pos[0] < 6 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
+          val += DEVELOPMENT[:centralized]
         end
       end
     end
