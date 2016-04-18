@@ -92,6 +92,8 @@ class Board
   end
 
   def is_mate?(color)
+    return false unless in_check?(color)
+
     legal_moves(color).empty?
   end
 

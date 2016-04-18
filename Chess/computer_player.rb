@@ -25,28 +25,42 @@ class ComputerPlayer
     best_eval = nil
     alpha = -100000
     beta = 100000
-    moves = @board.legal_moves_with_start(@color)
-    sort_by_captures(moves)
     mate = false
+    pieces = []
 
-    moves.each do |move|
-      save_move(move)
-      @board.make_any_move(move[0], move[1])
-      mate = true if @board.in_check?(@opp_color) && @board.is_mate?(@opp_color)
-
-      cur_node = Node.new(@board, @opp_color, @color)
-      cur_eval = -1 * cur_node.alpha_beta(depth, -beta, -alpha)
-      undo_move
-
-      return move if mate
-
-      if cur_eval > alpha
-        best_move = move
-        alpha = cur_eval
+    @board.grid.each do |row|
+      row.each do |tile|
+        pieces << tile if tile.class < Piece && tile.color == @color
       end
     end
-    p "best_eval #{alpha}"
 
+    pieces.each do |piece|
+      moves = []
+      piece_moves = []
+      piece_moves = piece.legal_moves(@board)
+      piece_moves.each do |target|
+        moves << [piece.curr_pos, target]
+      end
+      sort_by_captures(moves)
+      moves.each do |move|
+        save_move(move)
+        @board.make_any_move(move[0], move[1])
+        mate = true if @board.is_mate?(@opp_color)
+
+        cur_node = Node.new(@board, @opp_color, @color)
+        cur_eval = -1 * cur_node.alpha_beta(depth, -beta, -alpha, 1)
+        undo_move
+
+        return move if mate
+
+        if cur_eval > alpha
+          best_move = move
+          alpha = cur_eval
+        end
+      end
+    end
+
+    p "best_eval #{alpha}"
     best_move
   end
 
@@ -70,7 +84,7 @@ class ComputerPlayer
       end
     end
 
-    depth = 3
+    depth = 2
     depth = 4 if pieces < 10
     depth = 6 if pieces < 6
     depth = 8 if pieces < 4

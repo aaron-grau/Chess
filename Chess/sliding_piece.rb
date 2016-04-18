@@ -14,6 +14,7 @@ module SlidingPiece
       [-1,0],
       [0,-1]
     ]
+    
     def move_diag(pos)
       all_moves = possible_moves(pos,DIAG)
     end
@@ -40,7 +41,7 @@ module SlidingPiece
           new_squares << pos_new
         end
       end
-      
+
       new_squares
     end
 
