@@ -18,24 +18,40 @@ class Node
   end
 
 
-  def alpha_beta(ply, alpha, beta, counter = {count: 0})
+  def alpha_beta(ply, alpha, beta, cur_depth)
     return evaluate_pos if ply == 0
-    #dont check for mate unless position is check to avoid more expensive comp
-    return -1000 if @board.in_check?(@color) && @board.is_mate?(@color)
 
-    moves = @board.all_moves_with_start(@color)
-    sort_by_captures(moves)
+    return -1000 if @board.is_mate?(@color)
 
-    moves.each do |move|
-      save_move(move)
-      @board.make_any_move(move[0], move[1])
-      new_node = Node.new(@board, @opp_color, @color)
-      cur_eval = -1 * new_node.alpha_beta(ply - 1, -beta, -alpha, counter)
-      undo_move
+    pieces = []
 
-      return beta if cur_eval >= beta
+    @board.grid.each do |row|
+      row.each do |tile|
+        pieces << tile if tile.class < Piece && tile.color == @color
+      end
+    end
 
-      alpha = cur_eval if cur_eval > alpha
+    pieces.each do |piece|
+      moves = []
+      piece_moves = piece.moves(@board)
+      piece_moves.each do |target|
+        moves << [piece.curr_pos, target]
+      end
+      sort_by_captures(moves)
+      moves.each do |move|
+        save_move(move)
+        new_ply = ply - 1
+        #do extra plies until 4 depth for lines ending with captures
+        new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 5
+        @board.make_any_move(move[0], move[1])
+        new_node = Node.new(@board, @opp_color, @color)
+        cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1)
+        undo_move
+
+        return beta if cur_eval >= beta
+
+        alpha = cur_eval if cur_eval > alpha
+      end
     end
 
     return alpha;
