@@ -25,8 +25,9 @@ class ComputerPlayer
     best_eval = nil
     alpha = -100000
     beta = 100000
-    mate = false
     pieces = []
+    counter = {count: 0}
+    @non_captures = []
 
     @board.grid.each do |row|
       row.each do |tile|
@@ -41,25 +42,48 @@ class ComputerPlayer
       piece_moves.each do |target|
         moves << [piece.curr_pos, target]
       end
-      sort_by_captures(moves)
-      moves.each do |move|
+      captures = sort_by_captures(moves)
+      captures.each do |move|
         save_move(move)
         @board.make_any_move(move[0], move[1])
-        mate = true if @board.is_mate?(@opp_color)
+        if @board.is_mate?(@opp_color)
+          undo_move
+          return move
+        end
 
         cur_node = Node.new(@board, @opp_color, @color)
-        cur_eval = -1 * cur_node.alpha_beta(depth, -beta, -alpha, 1)
+        cur_eval = -1 * cur_node.alpha_beta(depth, -beta, -alpha, 1, counter)
         undo_move
-
-        return move if mate
 
         if cur_eval > alpha
           best_move = move
           alpha = cur_eval
         end
+
       end
     end
 
+    @non_captures.each do |move|
+      save_move(move)
+      @board.make_any_move(move[0], move[1])
+      if @board.is_mate?(@opp_color)
+        undo_move
+        return move
+      end
+      new_node = Node.new(@board, @opp_color, @color)
+      cur_eval = -1 * new_node.alpha_beta(depth, -beta, -alpha, 1, counter)
+      undo_move
+
+
+      return beta if cur_eval >= beta
+
+      if cur_eval > alpha
+        best_move = move
+        alpha = cur_eval
+      end
+    end
+
+    p "total nodes visited #{counter}"
     p "best_eval #{alpha}"
     best_move
   end
@@ -93,9 +117,18 @@ class ComputerPlayer
   end
 
   def sort_by_captures(moves)
+    captures = []
+    non_captures = []
+
     moves.each_with_index do |move, idx|
-      moves.unshift(moves.delete_at(idx)) if @board[move[1]].class < Piece
+      if @board[move[1]].class < Piece
+        captures << move
+      else
+        @non_captures << move
+      end
     end
+
+    captures
   end
 
 
