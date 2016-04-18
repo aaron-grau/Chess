@@ -23,7 +23,6 @@ class Node
     counter[:count] += 1
     return evaluate_pos if ply == 0
 
-
     pieces = []
 
     @board.grid.each do |row|
@@ -68,7 +67,7 @@ class Node
       save_move(move)
       new_ply = ply - 1
       #do extra plies until 4 depth for lines ending with captures
-      new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 5
+      new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 4
       @castle = false
       @queened = false
       special_move = @board.make_any_move(move[0], move[1])
