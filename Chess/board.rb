@@ -61,6 +61,7 @@ class Board
     end_row, end_col = end_pos
     piece = grid[start_row][start_col]
 
+    debugger if piece == " "
     unless piece.legal_moves(self).include?(end_pos)
       raise IllegalMoveError.new("Illegal Move!")
     end
@@ -154,7 +155,12 @@ class Board
     grid[end_row][end_col] = grid[start_row][start_col]
     grid[start_row][start_col] = " "
     grid[end_row][end_col].curr_pos = end_pos
+    # if start_piece.class == Pawn && (end_row == 0 || end_row == 7)
+    #   grid[end_row][end_col] == Queen.new(start_piece.color, self, end_pos)
+    #   return "queened"
+    # end
     start_piece.curr_pos = end_pos
+    return nil
   end
 
   def move(pos)
@@ -162,9 +168,14 @@ class Board
     start_row, start_col = start
     end_row, end_col = end_pos
     start_piece = @grid[start_row][start_col]
-    legal_move?(start,end_pos)
+    legal_move?(start, end_pos)
+
     @grid[end_row][end_col] = start_piece
     @grid[start_row][start_col] = " "
+    # if start_piece.class == Pawn && (end_row == 0 || end_row == 7)
+    #   grid[end_row][end_col] == Queen.new(start_piece.color, self, end_pos)
+    #   return "queened"
+    # end
     start_piece.curr_pos = end_pos
   end
 
