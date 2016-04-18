@@ -64,6 +64,8 @@ class Board
     unless piece.legal_moves(self).include?(end_pos)
       raise IllegalMoveError.new("Illegal Move!")
     end
+
+    true
   end
 
   def in_bounds?(pos)
@@ -157,17 +159,19 @@ class Board
        start_piece.can_castle = false
     end
     if start_piece.class == King
-      start_piece.can_castle = false
-      if end_col == 6 && start_col ==
+      if end_col == 6 && start_col == 4
         rook = @grid[start_row][start_col + 3]
         @grid[start_row][start_col + 3] = " "
-        @grid[starrt_row][start_col + 1] = rook
+        @grid[start_row][start_col + 1] = rook
         rook.curr_pos = [start_row, start_col + 1]
         start_piece.has_castled = true
         @grid[end_row][end_col] = @grid[start_row][start_col]
         @grid[start_row][start_col] = " "
         start_piece.curr_pos = end_pos
+        start_piece.can_castle = false
         return "k_castled"
+      else
+        start_piece.can_castle = false
       end
     end
     @grid[end_row][end_col] = @grid[start_row][start_col]
@@ -190,8 +194,7 @@ class Board
       start_piece.can_castle = false
     end
     if start_piece.class == King
-      start_piece.can_castle = false
-      if end_col - start_col == 2
+      if end_col == 6 && start_col == 4 && legal_move?(start, end_pos)
         rook = @grid[start_row][start_col + 3]
         @grid[start_row][start_col + 3] = " "
         @grid[start_row][start_col + 1] = rook
@@ -200,7 +203,10 @@ class Board
         @grid[end_row][end_col] = @grid[start_row][start_col]
         @grid[start_row][start_col] = " "
         start_piece.curr_pos = end_pos
+        start_piece.can_castle = false
         return "k_castled"
+      else
+        start_piece.can_castle = false
       end
     end
     legal_move?(start, end_pos)

@@ -51,7 +51,7 @@ class Node
         @queened = false
         special_move = @board.make_any_move(move[0], move[1])
         @queened = special_move == "queened"
-        @k_castle = special_move == "k_castled"
+        @k_castled = special_move == "k_castled"
         new_node = Node.new(@board, @opp_color, @color)
         cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
         undo_move
@@ -72,7 +72,7 @@ class Node
       @queened = false
       special_move = @board.make_any_move(move[0], move[1])
       @queened = special_move == "queened"
-      @k_castle = special_move == "k_castled"
+      @k_castled = special_move == "k_castled"
       new_node = Node.new(@board, @opp_color, @color)
       cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
       undo_move
@@ -95,20 +95,24 @@ class Node
     end_row, end_col = end_pos
     @last_captured = @board.grid[end_row][end_col]
     @reverse_move  = [end_pos, start]
-    @disabled_castling = true if @board[move[0]].can_castle
+    debugger if @board[start] == " "
+    @disabled_castling = true if @board[start].can_castle
   end
 
   def undo_move
-    @board[@reverse_move[0]].can_castle = true if @disabled_castling
     @board.make_any_move(@reverse_move[0], @reverse_move[1])
     @board.grid[@reverse_move[0][0]][@reverse_move[0][1]] = @last_captured
+    curr_pos = [@reverse_move[1][0], @reverse_move[1][1]]
+
     if @queened
       @board[@reverse_move[1]] = Pawn.new(@color, @board, @reverse_move[1])
     end
     if @k_castled
+      @board.make_any_move([curr_pos[0], curr_pos[1] + 1], [curr_pos[0], curr_pos[1] + 3])
+      @board[[curr_pos[0], curr_pos[1] + 3]].can_castle = true
       @board[@reverse_move[1]].has_castled = false
-      @board.make_any_move([@curr_pos[0], @curr_pos + 1], [@curr_pos[0], @curr_pos + 3])
     end
+    @board[@reverse_move[1]].can_castle = true if @disabled_castling
   end
 
   def evaluate_pos
@@ -142,7 +146,7 @@ class Node
         if piece.class == Pawn
           val += 0.005 * (6 - piece.curr_pos[0]).abs
           val += 0.2 if piece.curr_pos[0] == 1 || piece.curr_pos[0] == 2
-        elsif !(piece.class == Queen) && !(piece.class == King)
+        elsif piece.class == Knight || piece.class == Bishop
           val += 0.25 if piece.curr_pos[0] < 6
         elsif piece.class == Queen
           val += 0.1 if piece.curr_pos[0] < 6
@@ -150,6 +154,7 @@ class Node
         #king on back rank bonus on crowded board
         if piece.class == King
           val += 0.25 if pieces.length > 9 && piece.curr_pos[0] == 7
+          val += 0.75 if piece.has_castled
         else
           #centralized pieces bonus
           if piece.curr_pos[0] < 6 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
@@ -162,13 +167,14 @@ class Node
         if piece.class == Pawn
           val += 0.005 * (piece.curr_pos[0] - 1)
           val += 0.2 if piece.curr_pos[0] == 6 || piece.curr_pos[0] == 5
-        elsif !(piece.class == Queen) && !(piece.class == King)
+        elsif piece.class == Knight || piece.class == Bishop
           val += 0.2 if piece.curr_pos[0] > 1
         elsif piece.class == Queen
           val += 0.1 if piece.curr_pos[0] > 1
         end
         if piece.class == King
           val += 0.25 if pieces.length > 9 && piece.curr_pos[0] == 0
+          val += 0.75 if piece.has_castled
         else
           if piece.curr_pos[0] > 1 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
             val += 0.05

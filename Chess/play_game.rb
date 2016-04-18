@@ -1,4 +1,4 @@
-
+require 'byebug'
 require_relative 'string'
 require_relative 'illegal_move_error'
 require_relative "display"
