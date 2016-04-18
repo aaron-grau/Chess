@@ -27,16 +27,18 @@ class ComputerPlayer
     beta = 100000
     moves = @board.legal_moves_with_start(@color)
     sort_by_captures(moves)
+    mate = false
 
     moves.each do |move|
       save_move(move)
       @board.make_any_move(move[0], move[1])
-      #found mate in one dont check any other moves
-      return move if @board.in_check?(@opp_color) && @board.is_mate?(@opp_color)
+      mate = true if @board.in_check?(@opp_color) && @board.is_mate?(@opp_color)
 
       cur_node = Node.new(@board, @opp_color, @color)
       cur_eval = -1 * cur_node.alpha_beta(depth, -beta, -alpha)
       undo_move
+
+      return move if mate
 
       if cur_eval > alpha
         best_move = move

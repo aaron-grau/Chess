@@ -3,4 +3,3 @@
 
 sunday:
 1. add castling and promotion, allow undoing of both of these move. 
-2. DONE! try to make find move happen in reasonable amount of time
