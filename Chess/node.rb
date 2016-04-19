@@ -22,6 +22,7 @@ class Node
   def alpha_beta(ply, alpha, beta, cur_depth, counter)
     counter[:count] += 1
     return evaluate_pos if ply == 0
+    no_moves = true
 
     pieces = []
 
@@ -42,6 +43,7 @@ class Node
       end
       captures = sort_by_captures(moves)
       captures.each do |move|
+        no_moves = false
         save_move(move)
         new_ply = ply - 1
         #do extra plies until 5 depth for lines ending with captures
@@ -59,15 +61,17 @@ class Node
         return beta if cur_eval >= beta
 
         alpha = cur_eval if cur_eval > alpha
+
         return alpha if alpha > 1000
       end
     end
 
     @non_captures.each do |move|
+      no_moves = false
       save_move(move)
       new_ply = ply - 1
-      #do extra plies until 4 depth for lines ending with captures
-      new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 4
+      #do extra plies until 5 depth for lines ending with captures
+      new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 5
       @castle = false
       @queened = false
       special_move = @board.make_any_move(move[0], move[1])
@@ -85,6 +89,10 @@ class Node
       return alpha if alpha > 1000
     end
 
+    if no_moves
+      return -5000 if @board.is_mate?(@color)
+      return 0
+    end
     return alpha;
   end
 
@@ -159,8 +167,19 @@ class Node
         end
         #king on back rank bonus on crowded board
         if piece.class == King
-          val += 0.25 if pieces.length > 9 && piece.curr_pos[0] == 7
-          val += 0.75 if piece.has_castled
+          val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 7
+          #pawn in front of castled king bonus
+          if piece.has_castled
+            val += 0.75
+            if @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].class == Pawn &&
+               @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].color == color
+              val += 1
+            end
+            if @board[[piece.curr_pos[0] - 2, piece.curr_pos[1]]].class == Pawn &&
+               @board[[piece.curr_pos[0] - 2, piece.curr_pos[1]]].color == color
+              val += 0.75
+            end
+          end
         else
           #centralized pieces bonus
           if piece.curr_pos[0] < 6 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
@@ -179,8 +198,18 @@ class Node
           val += 0.1 if piece.curr_pos[0] > 1
         end
         if piece.class == King
-          val += 0.25 if pieces.length > 9 && piece.curr_pos[0] == 0
-          val += 0.75 if piece.has_castled
+          val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 0
+          if piece.has_castled
+            val += 0.75
+            if @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].class == Pawn &&
+               @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].color == color
+              val += 1
+            end
+            if @board[[piece.curr_pos[0] + 2, piece.curr_pos[1]]].class == Pawn &&
+               @board[[piece.curr_pos[0] + 2, piece.curr_pos[1]]].color == color
+              val += 0.75
+            end
+          end
         else
           if piece.curr_pos[0] > 1 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
             val += 0.05

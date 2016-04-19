@@ -60,7 +60,7 @@ class ComputerPlayer
         cur_eval = -1 * cur_node.alpha_beta(depth, -beta, -alpha, 1, counter)
         undo_move
 
-        if cur_eval > alpha
+        if cur_eval > alpha || best_move.nil?
           best_move = move
           alpha = cur_eval
         end
@@ -84,10 +84,7 @@ class ComputerPlayer
       cur_eval = -1 * new_node.alpha_beta(depth, -beta, -alpha, 1, counter)
       undo_move
 
-
-      return beta if cur_eval >= beta
-
-      if cur_eval > alpha
+      if cur_eval > alpha || best_move.nil?
         best_move = move
         alpha = cur_eval
       end
@@ -95,6 +92,7 @@ class ComputerPlayer
 
     p "total nodes visited #{counter}"
     p "best_eval #{alpha}"
+
     best_move
   end
 
@@ -135,10 +133,11 @@ class ComputerPlayer
       end
     end
 
-    depth = 3
+    depth = 2
+    depth = 3 if pieces < 14
     depth = 4 if pieces < 10
-    depth = 6 if pieces < 6
-    depth = 8 if pieces < 4
+    depth = 5 if pieces < 6
+    depth = 6 if pieces < 4
 
     depth
   end

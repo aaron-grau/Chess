@@ -158,6 +158,7 @@ class Board
     if start_piece.class == Rook
        start_piece.can_castle = false
     end
+    #castling logic
     if start_piece.class == King
       if end_col == 6 && start_col == 4
         rook = @grid[start_row][start_col + 3]
@@ -192,7 +193,7 @@ class Board
       @grid[end_row][end_col] = Queen.new(start_piece.color, self, end_pos)
       return "queened"
     end
-    debugger if start_piece == " "
+
     start_piece.curr_pos = end_pos
     return nil
   end
@@ -205,6 +206,7 @@ class Board
     if start_piece.class == Rook
       start_piece.can_castle = false
     end
+    #castling logic
     if start_piece.class == King
       if end_col == 6 && start_col == 4 && legal_move?(start, end_pos)
         rook = @grid[start_row][start_col + 3]
