@@ -1,4 +1,0 @@
-
-
-monday:
-1. add castling and promotion, allow undoing of both of these move.

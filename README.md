@@ -71,4 +71,4 @@ end
 ## Screenshot
 
 ![image]
-[image]: /image.png
+[image]: /chess.png
