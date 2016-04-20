@@ -48,12 +48,8 @@ class Node
         new_ply = ply - 1
         #do extra plies until 5 depth for lines ending with captures
         new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 5
-        @castle = false
-        @queened = false
         special_move = @board.make_any_move(move[0], move[1])
-        @queened = special_move == "queened"
-        @k_castled = special_move == "k_castled"
-        @q_castled = special_move == "q_castled"
+        special_save(special_move)
         new_node = Node.new(@board, @opp_color, @color)
         cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
         undo_move
@@ -229,6 +225,14 @@ class Node
     end
 
     total
+  end
+
+  def special_save(special_move)
+    @castle = false
+    @queened = false
+    @queened = special_move == "queened"
+    @k_castled = special_move == "k_castled"
+    @q_castled = special_move == "q_castled"
   end
 
   def sort_by_captures(moves)

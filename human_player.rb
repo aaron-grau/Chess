@@ -8,9 +8,9 @@ class HumanPlayer
     display = Display.new(board, @color)
     start_pos = display.navigate([])
     if board.is_empty?(start_pos)
-      raise IllegalMoveError.new("You picked an empty square!")
+      raise IllegalMoveError.new("")
     elsif board[start_pos].color != @color
-      raise IllegalMoveError.new("Pick a piece of your color.")
+      raise IllegalMoveError.new("")
     end
 
     board[start_pos].selected = true

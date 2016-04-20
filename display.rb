@@ -7,7 +7,7 @@ class Display
 
   def initialize(board, color = "black")
     @board = board
-    @cursor_pos = color == "black" ? [0, 0] : [7, 0]
+    @cursor_pos = color == "black" ? nil : [7, 0]
     @selected = false
   end
 
@@ -40,6 +40,7 @@ class Display
 
   def navigate(legal_moves)
     render(legal_moves)
+    puts 'Your turn!'
     input = get_input
     return navigate(legal_moves) unless @selected
     @selected = false

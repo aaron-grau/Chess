@@ -12,7 +12,7 @@ class Game
         board.move(@curr_player.play_turn(board))
       rescue IllegalMoveError => e
         if @curr_player.is_a?(HumanPlayer)
-          p e.message
+          puts e.message
         end
         retry
       end
