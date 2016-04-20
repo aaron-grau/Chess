@@ -1,6 +1,6 @@
 # Chess
 
-Play chess against an engine
+Play chess against a custom engine
 
 ## How to play
 
