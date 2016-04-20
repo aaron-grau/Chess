@@ -5,7 +5,7 @@ Play chess against a custom engine
 ## How to play
 
 - Download the repository onto your computer
-- Navigate to the file using terminal
+- Navigate to the folder on your computer using your terminal
 - Run the game using the command (must have ruby installed locally):
 ```
   ruby play_game.rb
