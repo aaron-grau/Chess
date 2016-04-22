@@ -107,7 +107,7 @@ class Board
       end
 
     pieces.each do |piece|
-     legal_moves += piece.legal_moves(self)
+      legal_moves += piece.legal_moves(self)
     end
 
     legal_moves
@@ -151,41 +151,21 @@ class Board
     legal_moves
   end
 
-  def make_any_move(start_pos, end_pos)
+  def make_any_move(start_pos, end_pos, real_board_move = false)
     start_row, start_col = start_pos
     end_row, end_col = end_pos
     start_piece = @grid[start_row][start_col]
+
     if start_piece.class == Rook
        start_piece.can_castle = false
     end
-    #castling logic
     if start_piece.class == King
-      if end_col == 6 && start_col == 4
-        rook = @grid[start_row][start_col + 3]
-        @grid[start_row][start_col + 3] = " "
-        @grid[start_row][start_col + 1] = rook
-        rook.curr_pos = [start_row, start_col + 1]
-        start_piece.has_castled = true
-        @grid[end_row][end_col] = @grid[start_row][start_col]
-        @grid[start_row][start_col] = " "
-        start_piece.curr_pos = end_pos
-        start_piece.can_castle = false
-        return "k_castled"
-      elsif end_col == 2 && start_col == 4
-        rook = @grid[start_row][start_col - 4]
-        @grid[start_row][start_col - 4] = " "
-        @grid[start_row][start_col - 1] = rook
-        rook.curr_pos = [start_row, start_col - 1]
-        start_piece.has_castled = true
-        @grid[end_row][end_col] = @grid[start_row][start_col]
-        @grid[start_row][start_col] = " "
-        start_piece.curr_pos = end_pos
-        start_piece.can_castle = false
-        return "q_castled"
-      else
-        start_piece.can_castle = false
-      end
+      castled = castling(start_piece, start_pos, end_pos)
+      return castled unless castled.nil?
     end
+
+    legal_move?(start_pos, end_pos) if real_board_move
+
     @grid[end_row][end_col] = @grid[start_row][start_col]
     @grid[start_row][start_col] = " "
 
@@ -195,59 +175,15 @@ class Board
     end
 
     start_piece.curr_pos = end_pos
-    return nil
+    nil
   end
 
   def move(pos)
-    start,end_pos = pos
-    start_row, start_col = start
-    end_row, end_col = end_pos
-    start_piece = @grid[start_row][start_col]
-    if start_piece.class == Rook
-      start_piece.can_castle = false
-    end
-    #castling logic
-    if start_piece.class == King
-      if end_col == 6 && start_col == 4 && legal_move?(start, end_pos)
-        rook = @grid[start_row][start_col + 3]
-        @grid[start_row][start_col + 3] = " "
-        @grid[start_row][start_col + 1] = rook
-        rook.curr_pos = [start_row, start_col + 1]
-        start_piece.has_castled = true
-        @grid[end_row][end_col] = @grid[start_row][start_col]
-        @grid[start_row][start_col] = " "
-        start_piece.curr_pos = end_pos
-        start_piece.can_castle = false
-        return "k_castled"
-      elsif end_col == 2 && start_col == 4
-        rook = @grid[start_row][start_col - 4]
-        @grid[start_row][start_col - 4] = " "
-        @grid[start_row][start_col - 1] = rook
-        rook.curr_pos = [start_row, start_col - 1]
-        start_piece.has_castled = true
-        @grid[end_row][end_col] = @grid[start_row][start_col]
-        @grid[start_row][start_col] = " "
-        start_piece.curr_pos = end_pos
-        start_piece.can_castle = false
-        return "q_castled"
-      else
-        start_piece.can_castle = false
-      end
-    end
-    legal_move?(start, end_pos)
-
-    @grid[end_row][end_col] = start_piece
-    @grid[start_row][start_col] = " "
-
-    if start_piece.class == Pawn && (end_row == 0 || end_row == 7)
-      @grid[end_row][end_col] = Queen.new(start_piece.color, self, end_pos)
-      return "queened"
-    end
-
-    start_piece.curr_pos = end_pos
+    make_any_move(pos[0], pos[1], true)
   end
 
   private
+
   def set_board
     @grid.each_index do |idx|
       case idx
@@ -267,6 +203,38 @@ class Board
     @grid[row].each_index do |idx2|
       @grid[row][idx2] = Pawn.new(color, self, [row,idx2])
     end
+  end
+
+  def castling(king, start_pos, end_pos)
+    start_row, start_col = start_pos
+    end_row, end_col = end_pos
+    if end_col == 6 && start_col == 4
+      rook = @grid[start_row][start_col + 3]
+      @grid[start_row][start_col + 3] = " "
+      @grid[start_row][start_col + 1] = rook
+      rook.curr_pos = [start_row, start_col + 1]
+      king.has_castled = true
+      @grid[end_row][end_col] = @grid[start_row][start_col]
+      @grid[start_row][start_col] = " "
+      king.curr_pos = end_pos
+      king.can_castle = false
+      return "k_castled"
+    elsif end_col == 2 && start_col == 4
+      rook = @grid[start_row][start_col - 4]
+      @grid[start_row][start_col - 4] = " "
+      @grid[start_row][start_col - 1] = rook
+      rook.curr_pos = [start_row, start_col - 1]
+      king.has_castled = true
+      @grid[end_row][end_col] = @grid[start_row][start_col]
+      @grid[start_row][start_col] = " "
+      king.curr_pos = end_pos
+      king.can_castle = false
+      return "q_castled"
+    else
+      king.can_castle = false
+    end
+
+    nil
   end
 
 end
