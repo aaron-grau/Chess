@@ -20,6 +20,12 @@ class Node
 
 
   def alpha_beta(ply, alpha, beta, cur_depth, counter)
+    @alpha = alpha
+    @beta = beta
+    @ply = ply
+    @cur_depth = cur_depth
+    @counter = counter
+
     counter[:count] += 1
     return evaluate_pos if ply == 0
     no_moves = true
@@ -44,44 +50,20 @@ class Node
       captures = sort_by_captures(moves)
       captures.each do |move|
         no_moves = false
-        save_move(move)
-        new_ply = ply - 1
-        #do extra plies until 5 depth for lines ending with captures
-        new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 5
-        special_move = @board.make_any_move(move[0], move[1])
-        special_save(special_move)
-        new_node = Node.new(@board, @opp_color, @color)
-        cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
-        undo_move
+        cur_eval = test_move(move, true)
 
-        return beta if cur_eval >= beta
-
-        alpha = cur_eval if cur_eval > alpha
-
-        return alpha if alpha > 1000
+        return @beta if cur_eval >= @beta
+        @alpha = cur_eval if cur_eval > @alpha
+        return @alpha if @alpha > 1000
       end
     end
 
     @non_captures.each do |move|
       no_moves = false
-      save_move(move)
-      new_ply = ply - 1
-      #do extra plies until 5 depth for lines ending with captures
-      new_ply = ply if @board[move[1]].class < Piece && new_ply == 0 && cur_depth < 5
-      @castle = false
-      @queened = false
-      special_move = @board.make_any_move(move[0], move[1])
-      @queened = special_move == "queened"
-      @k_castled = special_move == "k_castled"
-      @q_castled = special_move == "q_castled"
-      new_node = Node.new(@board, @opp_color, @color)
-      cur_eval = -1 * new_node.alpha_beta(new_ply, -beta, -alpha, cur_depth + 1, counter)
-      undo_move
+      cur_eval = test_move(move)
 
-      return beta if cur_eval >= beta
-
-      alpha = cur_eval if cur_eval > alpha
-
+      return @beta if cur_eval >= @beta
+      @alpha = cur_eval if cur_eval > @alpha
       return alpha if alpha > 1000
     end
 
@@ -89,7 +71,7 @@ class Node
       return -5000 if @board.is_mate?(@color)
       return 0
     end
-    return alpha;
+    return @alpha;
   end
 
   private
@@ -233,6 +215,29 @@ class Node
     @queened = special_move == "queened"
     @k_castled = special_move == "k_castled"
     @q_castled = special_move == "q_castled"
+  end
+
+  def test_move(move, capture = false)
+    @castle = false
+    @queened = false
+    save_move(move)
+    special_move = @board.make_any_move(move[0], move[1])
+    @queened = special_move == "queened"
+    @k_castled = special_move == "k_castled"
+    @q_castled = special_move == "q_castled"
+
+    new_ply = @ply - 1
+    new_ply += 1 if capture && @cur_depth < 5 && new_ply == 0
+    cur_node = Node.new(@board, @opp_color, @color)
+    cur_eval = -1 * cur_node.alpha_beta(new_ply, -@beta, -@alpha, @cur_depth + 1, @counter)
+    undo_move
+
+    if cur_eval > @alpha || @best_move.nil?
+      @best_move = move
+      @alpha = cur_eval
+    end
+
+    cur_eval
   end
 
   def sort_by_captures(moves)

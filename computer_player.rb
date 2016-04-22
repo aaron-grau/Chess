@@ -25,10 +25,10 @@ class ComputerPlayer
   def find_best_move
     best_move = nil
     best_eval = nil
-    alpha = -100000
-    beta = 100000
+    @alpha = -100000
+    @beta = 100000
     pieces = []
-    counter = {count: 0}
+    @counter = {count: 0}
     @non_captures = []
 
     @board.grid.each do |row|
@@ -45,57 +45,23 @@ class ComputerPlayer
         moves << [piece.curr_pos, target]
       end
       captures = sort_by_captures(moves)
+
       captures.each do |move|
-        @castle = false
-        @queened = false
-        save_move(move)
-        special_move = @board.make_any_move(move[0], move[1])
-        @queened = special_move == "queened"
-        @k_castled = special_move == "k_castled"
-        @q_castled = special_move == "q_castled"
-        if @board.is_mate?(@opp_color)
-          undo_move
-          return move
-        end
-
-        cur_node = Node.new(@board, @opp_color, @color)
-        cur_eval = -1 * cur_node.alpha_beta(depth, -beta, -alpha, 1, counter)
-        undo_move
-
-        if cur_eval > alpha || best_move.nil?
-          best_move = move
-          alpha = cur_eval
-        end
-
+        return_move = test_move(move)
+        return return_move unless return_move.nil?
       end
+
     end
 
     @non_captures.each do |move|
-      @castle = false
-      @queened = false
-      save_move(move)
-      special_move = @board.make_any_move(move[0], move[1])
-      @queened = special_move == "queened"
-      @k_castled = special_move == "k_castled"
-      @q_castled = special_move == "q_castled"
-      if @board.is_mate?(@opp_color)
-        undo_move
-        return move
-      end
-      new_node = Node.new(@board, @opp_color, @color)
-      cur_eval = -1 * new_node.alpha_beta(depth, -beta, -alpha, 1, counter)
-      undo_move
-
-      if cur_eval > alpha || best_move.nil?
-        best_move = move
-        alpha = cur_eval
-      end
+      return_move = test_move(move)
+      return return_move unless return_move.nil?
     end
 
-    p "total nodes visited #{counter}"
-    p "best_eval #{alpha}"
+    p "total nodes visited #{@counter}"
+    p "best_eval #{@alpha}"
 
-    best_move
+    @best_move
   end
 
   def save_move(move)
@@ -157,6 +123,31 @@ class ComputerPlayer
     end
 
     captures
+  end
+
+  def test_move(move)
+    @castle = false
+    @queened = false
+    save_move(move)
+    special_move = @board.make_any_move(move[0], move[1])
+    @queened = special_move == "queened"
+    @k_castled = special_move == "k_castled"
+    @q_castled = special_move == "q_castled"
+    if @board.is_mate?(@opp_color)
+      undo_move
+      return move
+    end
+
+    cur_node = Node.new(@board, @opp_color, @color)
+    cur_eval = -1 * cur_node.alpha_beta(depth, -@beta, -@alpha, 1, @counter)
+    undo_move
+
+    if cur_eval > @alpha || @best_move.nil?
+      @best_move = move
+      @alpha = cur_eval
+    end
+
+    nil
   end
 
 

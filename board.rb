@@ -123,7 +123,6 @@ class Board
 
     pieces.each do |piece|
        piece_moves = piece.moves(self)
-
        piece_moves.each do |target|
          all_moves << [piece.curr_pos, target]
        end
@@ -142,7 +141,6 @@ class Board
 
     pieces.each do |piece|
        piece_moves = piece.legal_moves(self)
-
        piece_moves.each do |target|
          legal_moves << [piece.curr_pos, target]
        end
