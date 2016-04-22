@@ -15,7 +15,8 @@ class ComputerPlayer
     display.render([])
     puts "I'm trying to find the best move..."
     puts Benchmark.measure { @move = find_best_move }
-
+    puts "total nodes visited #{@counter}"
+    puts "best_eval #{@alpha}"
     @move
   end
 
@@ -57,9 +58,6 @@ class ComputerPlayer
       return_move = test_move(move)
       return return_move unless return_move.nil?
     end
-
-    p "total nodes visited #{@counter}"
-    p "best_eval #{@alpha}"
 
     @best_move
   end
