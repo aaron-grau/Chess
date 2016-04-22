@@ -45,4 +45,4 @@ end
 ## Screenshot
 
 ![image]
-[image]: /chess.png
+[image]: images/chess.png
