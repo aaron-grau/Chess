@@ -117,10 +117,8 @@ class Node
       end
     end
 
-
     piece_eval = evaluate_pieces(pieces) - evaluate_pieces(opp_pieces)
     development_eval = development(pieces, @color) - development(opp_pieces, @opp_color)
-
 
     piece_eval + development_eval
   end
