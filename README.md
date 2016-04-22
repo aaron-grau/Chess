@@ -36,7 +36,7 @@ def test_move(move, capture = false)
   cur_eval = -1 * cur_node.alpha_beta(new_ply, -@beta, -@alpha, @cur_depth + 1, @counter)
   undo_move
 
-  #set alpha and best move to the current move if its better than previously found move
+  #set alpha and best move to the current move if its better than previously found best move
   if cur_eval > @alpha || @best_move.nil?
     @best_move = move
     @alpha = cur_eval
