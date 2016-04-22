@@ -68,6 +68,6 @@ class Piece
 
     @can_castle = true if @disabled_castling
   end
-
+  
 
 end
