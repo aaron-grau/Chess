@@ -6,7 +6,7 @@ Play chess against a custom engine
 
 1. Download the repository onto your computer
 2. Navigate to the folder on your computer using your terminal
-3. Run the game using the command (must have ruby installed locally): ruby play_game.rb
+3. Run the game using the command (must have ruby installed locally): 'ruby play_game.rb'
 4. Depending on your default terminal font size you may have to magnify the terminal to make the board more easily viewable
 5. Use wasd to navigate around the board, press h or spacebar to select the piece you're hovering over
 6. Navigate to where you want to move the piece and press h or spacebar again
