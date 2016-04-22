@@ -126,67 +126,74 @@ class Node
   end
 
   def development(pieces, color)
+    color == COLORS[0] ? white_dev(pieces) : black_dev(pieces)
+  end
+
+  def white_dev(pieces)
     val = 0
-    if (color == COLORS[0])
-      pieces.each do |piece|
-        #value pawn advancement different than normal developmenet
-        if piece.class == Pawn
-          val += 0.005 * (6 - piece.curr_pos[0]).abs
-          val += 0.2 if piece.curr_pos[0] == 1 || piece.curr_pos[0] == 2
-        elsif piece.class == Knight || piece.class == Bishop
-          val += 0.25 if piece.curr_pos[0] < 6
-        elsif piece.class == Queen
-          val += 0.1 if piece.curr_pos[0] < 6
-        end
-        #king on back rank bonus on crowded board
-        if piece.class == King
-          val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 7
-          #pawn in front of castled king bonus
-          if piece.has_castled
+    pieces.each do |piece|
+      #value pawn advancement different than normal developmenet
+      if piece.class == Pawn
+        val += 0.005 * (6 - piece.curr_pos[0]).abs
+        val += 0.2 if piece.curr_pos[0] == 1 || piece.curr_pos[0] == 2
+      elsif piece.class == Knight || piece.class == Bishop
+        val += 0.25 if piece.curr_pos[0] < 6
+      elsif piece.class == Queen
+        val += 0.1 if piece.curr_pos[0] < 6
+      end
+      #king on back rank bonus on crowded board
+      if piece.class == King
+        val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 7
+        #pawn in front of castled king bonus
+        if piece.has_castled
+          val += 0.75
+          if @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].class == Pawn &&
+             @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].color == COLORS[0]
+            val += 1
+          end
+          if @board[[piece.curr_pos[0] - 2, piece.curr_pos[1]]].class == Pawn &&
+             @board[[piece.curr_pos[0] - 2, piece.curr_pos[1]]].color == COLORS[0]
             val += 0.75
-            if @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].class == Pawn &&
-               @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].color == color
-              val += 1
-            end
-            if @board[[piece.curr_pos[0] - 2, piece.curr_pos[1]]].class == Pawn &&
-               @board[[piece.curr_pos[0] - 2, piece.curr_pos[1]]].color == color
-              val += 0.75
-            end
           end
-        else
-          #centralized pieces bonus
-          if piece.curr_pos[0] < 6 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
-            val += 0.05
-          end
+        end
+      else
+        #centralized pieces bonus
+        if piece.curr_pos[0] < 6 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
+          val += 0.05
         end
       end
-    else
-      pieces.each do |piece|
-        if piece.class == Pawn
-          val += 0.005 * (piece.curr_pos[0] - 1)
-          val += 0.2 if piece.curr_pos[0] == 6 || piece.curr_pos[0] == 5
-        elsif piece.class == Knight || piece.class == Bishop
-          val += 0.2 if piece.curr_pos[0] > 1
-        elsif piece.class == Queen
-          val += 0.1 if piece.curr_pos[0] > 1
-        end
-        if piece.class == King
-          val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 0
-          if piece.has_castled
+    end
+
+    val
+  end
+
+  def black_dev(pieces)
+    val = 0
+    pieces.each do |piece|
+      if piece.class == Pawn
+        val += 0.005 * (piece.curr_pos[0] - 1)
+        val += 0.2 if piece.curr_pos[0] == 6 || piece.curr_pos[0] == 5
+      elsif piece.class == Knight || piece.class == Bishop
+        val += 0.2 if piece.curr_pos[0] > 1
+      elsif piece.class == Queen
+        val += 0.1 if piece.curr_pos[0] > 1
+      end
+      if piece.class == King
+        val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 0
+        if piece.has_castled
+          val += 0.75
+          if @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].class == Pawn &&
+             @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].color == COLORS[1]
+            val += 1
+          end
+          if @board[[piece.curr_pos[0] + 2, piece.curr_pos[1]]].class == Pawn &&
+             @board[[piece.curr_pos[0] + 2, piece.curr_pos[1]]].color == COLORS[1]
             val += 0.75
-            if @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].class == Pawn &&
-               @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].color == color
-              val += 1
-            end
-            if @board[[piece.curr_pos[0] + 2, piece.curr_pos[1]]].class == Pawn &&
-               @board[[piece.curr_pos[0] + 2, piece.curr_pos[1]]].color == color
-              val += 0.75
-            end
           end
-        else
-          if piece.curr_pos[0] > 1 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
-            val += 0.05
-          end
+        end
+      else
+        if piece.curr_pos[0] > 1 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
+          val += 0.05
         end
       end
     end
