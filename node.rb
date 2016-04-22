@@ -25,10 +25,10 @@ class Node
     @ply = ply
     @cur_depth = cur_depth
     @counter = counter
+    @no_moves = true
 
     counter[:count] += 1
     return evaluate_pos if ply == 0
-    no_moves = true
 
     pieces = []
 
@@ -49,28 +49,23 @@ class Node
       end
       captures = sort_by_captures(moves)
       captures.each do |move|
-        no_moves = false
         cur_eval = test_move(move, true)
-
-        return @beta if cur_eval >= @beta
-        @alpha = cur_eval if cur_eval > @alpha
-        return @alpha if @alpha > 1000
+        return_early = alpha_beta_checker(cur_eval)
+        return return_early unless return_early.nil?
       end
     end
 
     @non_captures.each do |move|
-      no_moves = false
       cur_eval = test_move(move)
-
-      return @beta if cur_eval >= @beta
-      @alpha = cur_eval if cur_eval > @alpha
-      return alpha if alpha > 1000
+      return_early = alpha_beta_checker(cur_eval)
+      return return_early unless return_early.nil?
     end
 
-    if no_moves
-      return -5000 if @board.is_mate?(@color)
+    if @no_moves
+      #stalemate
       return 0
     end
+
     return @alpha;
   end
 
@@ -218,6 +213,7 @@ class Node
   end
 
   def test_move(move, capture = false)
+    @no_moves = false
     @castle = false
     @queened = false
     save_move(move)
@@ -253,6 +249,14 @@ class Node
     end
 
     captures
+  end
+
+  def alpha_beta_checker(cur_eval)
+    return @beta if cur_eval >= @beta
+    @alpha = cur_eval if cur_eval > @alpha
+    return @alpha if @alpha > 1000
+
+    nil
   end
 
 
