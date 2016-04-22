@@ -23,16 +23,20 @@ def test_move(move, capture = false)
   @queened = false
   save_move(move)
   special_move = @board.make_any_move(move[0], move[1])
+  #check to see if a 'special move' has occurred so it can be undone on way up tree
   @queened = special_move == "queened"
   @k_castled = special_move == "k_castled"
   @q_castled = special_move == "q_castled"
 
   new_ply = @ply - 1
+  #go deeper if line ends with capture
   new_ply += 1 if capture && @cur_depth < 5 && new_ply == 0
+  #make a new node
   cur_node = Node.new(@board, @opp_color, @color)
   cur_eval = -1 * cur_node.alpha_beta(new_ply, -@beta, -@alpha, @cur_depth + 1, @counter)
   undo_move
 
+  #set alpha and best move to the current move if its better than previously found move
   if cur_eval > @alpha || @best_move.nil?
     @best_move = move
     @alpha = cur_eval
