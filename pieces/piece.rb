@@ -8,11 +8,11 @@ class Piece
   end
 
   def moves(board)
-    raise StandardError.message("This shouldn't be called")
+    raise StandardError.message("child should overwrite")
   end
 
   def to_s
-    raise StandardError.message("to_s shouldn't be called")
+    raise StandardError.message("child should overwrite")
   end
 
   def legal_moves(board)
@@ -28,6 +28,9 @@ class Piece
       @q_castled = special_move == "q_castled"
       flag = @board.in_check?(color)
       undo_move
+
+      #makes sure not castling through or out of check
+      flag = castle_check if @k_castled || @q_castled
 
       flag
     end
@@ -49,25 +52,50 @@ class Piece
     @disabled_castling = true if self.can_castle
   end
 
-  def undo_move
+  def undo_move(ignore_castle = false)
     @board.make_any_move(@reverse_move[0], @reverse_move[1])
     @board.grid[@reverse_move[0][0]][@reverse_move[0][1]] = @last_captured
     if @queened
       @board[@reverse_move[1]] = Pawn.new(@color, @board, @reverse_move[1])
     end
-    if @k_castled
-      @has_castled = false
-      @board.make_any_move([@curr_pos[0], @curr_pos[1] + 1], [@curr_pos[0], @curr_pos[1] + 3])
-      @board[[@curr_pos[0], @curr_pos[1] + 3]].can_castle = true
-    end
-    if @q_castled
-      @has_castled = false
-      @board.make_any_move([@curr_pos[0], @curr_pos[1] - 1], [@curr_pos[0], @curr_pos[1] - 4])
-      @board[[@curr_pos[0], @curr_pos[1] - 4]].can_castle = true
+    unless ignore_castle
+      if @k_castled
+        @has_castled = false
+        @board.make_any_move([@curr_pos[0], @curr_pos[1] + 1], [@curr_pos[0], @curr_pos[1] + 3])
+        @board[[@curr_pos[0], @curr_pos[1] + 3]].can_castle = true
+      end
+      if @q_castled
+        @has_castled = false
+        @board.make_any_move([@curr_pos[0], @curr_pos[1] - 1], [@curr_pos[0], @curr_pos[1] - 4])
+        @board[[@curr_pos[0], @curr_pos[1] - 4]].can_castle = true
+      end
     end
 
     @can_castle = true if @disabled_castling
   end
-  
+
+  def castle_check
+    flag = false
+    return true if board.in_check?(color)
+
+    if @k_castled
+     one_right = [@curr_pos[0], @curr_pos[1] + 1]
+     save_move(one_right)
+     @board.make_any_move(@curr_pos, one_right)
+     flag = @board.in_check?(color)
+     undo_move(true)
+     return flag
+    end
+
+    if @q_castled
+      one_left = [@curr_pos[0], @curr_pos[1] - 1]
+      save_move(one_left)
+      @board.make_any_move(@curr_pos, one_left)
+      flag = @board.in_check?(color)
+      undo_move(true)
+      return flag
+    end
+  end
+
 
 end

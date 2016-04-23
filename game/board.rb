@@ -154,6 +154,8 @@ class Board
     end_row, end_col = end_pos
     start_piece = @grid[start_row][start_col]
 
+    legal_move?(start_pos, end_pos) if real_board_move
+
     if start_piece.class == Rook
        start_piece.can_castle = false
     end
@@ -162,8 +164,6 @@ class Board
       return castled unless castled.nil?
     end
 
-    legal_move?(start_pos, end_pos) if real_board_move
-
     @grid[end_row][end_col] = @grid[start_row][start_col]
     @grid[start_row][start_col] = " "
 
@@ -171,8 +171,8 @@ class Board
       @grid[end_row][end_col] = Queen.new(start_piece.color, self, end_pos)
       return "queened"
     end
-
     start_piece.curr_pos = end_pos
+
     nil
   end
 
