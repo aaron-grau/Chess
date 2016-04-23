@@ -72,16 +72,6 @@ class Node
 
   private
 
-  def save_move(move)
-    @disabled_castling = false
-    start, end_pos = move
-    end_row, end_col = end_pos
-    @last_captured = @board.grid[end_row][end_col]
-    @reverse_move  = [end_pos, start]
-
-    @disabled_castling = true if @board[start].can_castle
-  end
-
   def evaluate_pos
     pieces = []
     @board.grid.each do |row|
@@ -208,7 +198,7 @@ class Node
     @q_castled = special_move == "q_castled"
 
     new_ply = @ply - 1
-    new_ply += 1 if capture && @cur_depth < 5 && new_ply == 0
+    new_ply = 1 if capture && new_ply == 0 && @cur_depth < 6
     cur_node = Node.new(@board, @opp_color, @color)
     cur_eval = -1 * cur_node.alpha_beta(new_ply, -@beta, -@alpha, @cur_depth + 1, @counter)
     undo_move

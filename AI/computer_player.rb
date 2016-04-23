@@ -63,15 +63,6 @@ class ComputerPlayer
     @best_move
   end
 
-  def save_move(move)
-    @disabled_castling = false
-    start, end_pos = move
-    end_row, end_col = end_pos
-    @last_captured = @board.grid[end_row][end_col]
-    @reverse_move  = [end_pos, start]
-    @disabled_castling = true if @board[start].can_castle
-  end
-
 
   def depth
     pieces = 0
@@ -82,10 +73,10 @@ class ComputerPlayer
     end
 
     depth = 2
-    depth = 3 if pieces < 14
     depth = 4 if pieces < 10
     depth = 5 if pieces < 6
-    depth = 6 if pieces < 4
+    depth = 6 if pieces < 5
+    depth = 8 if pieces < 4
 
     depth
   end

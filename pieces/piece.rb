@@ -53,7 +53,8 @@ class Piece
   end
 
   def undo_move(ignore_castle = false)
-    @board.make_any_move(@reverse_move[0], @reverse_move[1])
+    @board[@reverse_move[1]] = self
+    @curr_pos = @reverse_move[1]
     @board.grid[@reverse_move[0][0]][@reverse_move[0][1]] = @last_captured
     if @queened
       @board[@reverse_move[1]] = Pawn.new(@color, @board, @reverse_move[1])
