@@ -15,4 +15,9 @@
 /log/*
 !/log/.keep
 /tmp
+node_modules
+/app/assets/javascripts/bundle.js
 .byebug_history
+bundle.js
+.DS_store
+DS_store

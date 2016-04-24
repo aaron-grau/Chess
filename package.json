@@ -1,0 +1,39 @@
+{
+  "name": "Chess",
+  "version": "1.0.0",
+  "description": "Chess Engine",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "babel": "^6.5.2",
+    "babel-core": "^6.7.4",
+    "babel-loader": "^6.2.4",
+    "babel-preset-react": "^6.5.0",
+    "flux": "^2.1.1",
+    "history": "^2.0.1",
+    "less": "^2.6.1",
+    "react": "^0.14.7",
+    "react-addons-linked-state-mixin": "^0.14.7",
+    "react-click-outside": "^2.1.0",
+    "react-dom": "^0.14.7",
+    "react-modal": "^0.6.1",
+    "react-modal-dialog": "^2.0.0",
+    "react-onclickoutside": "^4.7.0",
+    "react-router": "^2.0.1",
+    "react-util": "^2.2.0",
+    "webpack": "^1.13.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "./node_modules/.bin/webpack"
+  },
+  "engines": {
+    "node": "5.1.0",
+    "npm": "3.3.12"
+  },
+  "author": "",
+  "license": "ISC"
+}
