@@ -120,7 +120,6 @@ class Board
       @grid.flatten.select do |tile|
         tile.class < Piece && tile.color == color
       end
-
     pieces.each do |piece|
        piece_moves = piece.moves(self)
        piece_moves.each do |target|
