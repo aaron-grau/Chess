@@ -1,20 +1,66 @@
 var React = require('react');
 var PropTypes = React.PropTypes;
+var DropTarget = require('react-dnd').DropTarget;
+var Piece = require('./piece');
+
+function movePiece(pos1, pos2) {
+
+}
+
+var squareTarget = {
+  drop: function (props) {
+    return {pos2: props.pos};
+  }
+};
+
+function collect(connect, monitor) {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver()
+  };
+};
 
 var Tile = React.createClass({
 
   render: function() {
     var piece = <div></div>;
+    var connectDropTarget = this.props.connectDropTarget;
+    var isOver = this.props.isOver;
     if (this.props.piece && this.props.piece != "String") {
-      piece = <div className="piece">{this.props.piece[0]}</div>
+      piece = <Piece
+        image={this.props.image}
+        color={this.props.pieceColor}
+        pos={this.props.pos}
+        handleMove={this.props.handleMove}
+        moves={this.props.moves}
+        />
     }
-    return (
-      <div className={this.props.color + " tile"}>
-        {piece}
+
+    return (connectDropTarget(
+        <div style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%'
+        }}>
+        <div className={this.props.color + " tile"}>
+          {piece}
+        </div>
+        {isOver &&
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            height: '100%',
+            width: '100%',
+            zIndex: 1,
+            opacity: 0.5,
+            backgroundColor: '#aaa',
+          }} />
+        }
       </div>
-    );
+    ));
   }
 
 });
 
-module.exports = Tile;
+module.exports = DropTarget("piece", squareTarget, collect)(Tile);

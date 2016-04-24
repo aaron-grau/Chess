@@ -3,11 +3,14 @@ var PropTypes = React.PropTypes;
 var BoardStore = require('../stores/board');
 var ApiUtil = require('../util/api_util');
 var Tile = require('./tile');
+var DragDropContext = require('react-dnd').DragDropContext;
+var HTML5Backend = require('react-dnd-html5-backend');
+
 
 var Board = React.createClass({
 
   getInitialState: function () {
-    return {board: BoardStore.get()};
+    return {board: BoardStore.get(), moved: false};
   },
 
   componentDidMount: function () {
@@ -20,7 +23,16 @@ var Board = React.createClass({
   },
 
   _boardChange: function () {
-    this.setState({board: BoardStore.get()});
+    this.setState({board: BoardStore.get(), moved: false});
+  },
+
+  handleMove: function (pos1, pos2, color) {
+    if (!this.state.moved) {
+      var board = this.state.board;
+      board[pos2[0]][pos2[1]] = board[pos1[0]][pos1[1]];
+      board[pos1[0]][pos1[1]] = {piece: "String"};
+      this.setState({board: board, moved: true})
+    }
   },
 
   render: function() {
@@ -31,9 +43,14 @@ var Board = React.createClass({
         var color = ((i + j) % 2) ? "dark" : "light";
         tiles[i].push(
           <Tile key={i + j*2}
-          pos={[i, j]} color={color}
+          pos={[i, j]}
+          color={color}
           pieceColor={this.state.board[i][j].color}
-          piece={this.state.board[i][j].piece}/>
+          piece={this.state.board[i][j].piece}
+          image={this.state.board[i][j].image}
+          moves={this.state.board[i][j].moves}
+          handleMove={this.handleMove}
+          />
         )
       }
     }
@@ -54,4 +71,4 @@ var Board = React.createClass({
 
 });
 
-module.exports = Board;
+module.exports = DragDropContext(HTML5Backend)(Board);
