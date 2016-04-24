@@ -23,11 +23,15 @@ class Board
     Rook.new(self, [7,7])
   ]
 
-  def initialize(new_set = true)
-    @grid = Array.new(8){Array.new(8){" "}}
-    set_board if new_set
-    @w_king = @grid[7][4]
-    @b_king = @grid[0][4]
+  def initialize(grid = nil)
+    if grid.nil?
+      @grid = Array.new(8){Array.new(8){" "}}
+      set_board
+      @w_king = @grid[7][4]
+      @b_king = @grid[0][4]
+    else
+
+    end
   end
 
   def [](pos)

@@ -31,7 +31,16 @@ var Board = React.createClass({
       var board = this.state.board;
       board[pos2[0]][pos2[1]] = board[pos1[0]][pos1[1]];
       board[pos1[0]][pos1[1]] = {piece: "String"};
-      this.setState({board: board, moved: true})
+      this.setState({board: board, moved: true});
+      letter_board = []
+      for (var i = 0; i < 8; i++) {
+        letter_board.push([]);
+        for (var j = 0; j < 8; j++) {
+          letter_board[i].push([{piece: board[i][j].piece, color: board[i][j].color}]);
+        }
+      }
+
+      ApiUtil.makeMove(JSON.stringify(letter_board));
     }
   },
 

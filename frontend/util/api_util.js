@@ -11,6 +11,18 @@ var ApiUtil = {
         BoardActions.receiveBoard(board);
       },
     });
+  },
+
+  makeMove: function (board) {
+    $.ajax({
+      type: "PATCH",
+      url: "/api/play",
+      dataType: "json",
+      data: {board: board},
+      success: function (board) {
+        BoardActions.receiveBoard(board);
+      },
+    });
   }
 
 };
