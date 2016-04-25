@@ -47,7 +47,7 @@ var Home = React.createClass({
           </li>
           </ul>
           <footer>
-            <ul class="links-list group">
+            <ul className="links-list group">
               <li><a href="https://github.com/Aarong93">Github</a></li>
               <li><a href="https://www.linkedin.com/in/aaronrgrau">Linkedin</a></li>
               <li><a href="http://www.aarongrau.com">Portfolio</a></li>
