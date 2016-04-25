@@ -12,13 +12,7 @@ class ComputerPlayer
 
   def play_turn(board)
     @board = board
-    display = Display.new(board, @color)
-    display.render([])
-    puts "I'm trying to find the best move..."
-    puts Benchmark.measure { @move = find_best_move }
-    puts "total nodes visited #{@counter}"
-    puts "best_eval #{@alpha}"
-    @move
+    find_best_move
   end
 
 

@@ -37,27 +37,21 @@ var Tile = React.createClass({
     }
 
     return (connectDropTarget(
-        <div style={{
-          position: 'relative',
-          width: '100%',
-          height: '100%'
-        }}>
         <div className={this.props.color + " tile"}>
           {piece}
+          {isOver &&
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              height: '100%',
+              width: '100%',
+              zIndex: 1,
+              opacity: 0.5,
+              backgroundColor: 'yellow'
+            }} />
+          }
         </div>
-        {isOver &&
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            height: '100%',
-            width: '100%',
-            zIndex: 1,
-            opacity: 0.5,
-            backgroundColor: '#aaa',
-          }} />
-        }
-      </div>
     ));
   }
 

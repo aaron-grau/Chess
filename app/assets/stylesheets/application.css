@@ -30,8 +30,7 @@
  	margin: 0;
  	padding: 0;
  	border: 0;
- 	font-size: 100%;
- 	font: inherit;
+ 	font-family: inherit;
  	vertical-align: baseline;
  	text-decoration: inherit;
  	color: inherit;
@@ -43,10 +42,17 @@
  footer, header, hgroup, menu, nav, section {
  	display: block;
  }
+
+ html {
+   min-height: 100%;
+
+ }
  body {
  	line-height: 1;
-   background-color: #fff;
+  background-color: #FFF1C8;
    word-wrap: break-word;
+   height: 100%;
+   font-family: sans-serif;
  }
  p {
    overflow: hidden;

@@ -1,10 +1,11 @@
 class Piece
   attr_reader :color
-  attr_accessor :selected, :curr_pos, :board, :can_castle
+  attr_accessor :selected, :curr_pos, :board, :can_castle, :has_castled
 
-  def initialize(color = 'white', board, curr_pos)
+  def initialize(color, board, curr_pos, options)
     @color, @board, @curr_pos, @selected = color, board, curr_pos, false
-    @can_castle = false;
+    @can_castle = options["can_castle"];
+    @has_castled = options["has_castled"]
   end
 
   def moves(board)

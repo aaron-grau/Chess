@@ -3,34 +3,49 @@ class Board
   attr_accessor :grid
 
   BLACK_PIECES = [
-    Rook.new("black", self, [0,0]),
+    Rook.new("black", self, [0,0], {"has_castled" => false, "can_castle" => true}),
     Knight.new("black", self, [0,1]),
     Bishop.new("black", self, [0,2]),
     Queen.new("black", self, [0,3]),
-    King.new("black", self, [0,4]),
+    King.new("black", self, [0,4], {"has_castled" => false, "can_castle" => true}),
     Bishop.new("black", self, [0,5]),
     Knight.new("black", self, [0,6]),
-    Rook.new("black", self, [0,7])
+    Rook.new("black", self, [0,7], {"has_castled" => false, "can_castle" => true})
   ]
   WHITE_PIECES = [
-    Rook.new(self, [7,0]),
-    Knight.new(self, [7,1]),
-    Bishop.new(self, [7,2]),
-    Queen.new(self, [7,3]),
-    King.new(self, [7,4]),
-    Bishop.new(self, [7,5]),
-    Knight.new(self, [7,6]),
-    Rook.new(self, [7,7])
+    Rook.new("white", self, [7,0], {"has_castled" => false, "can_castle" => true}),
+    Knight.new("white", self, [7,1]),
+    Bishop.new("white", self, [7,2]),
+    Queen.new("white", self, [7,3]),
+    King.new("white", self, [7,4], {"has_castled" => false, "can_castle" => true}),
+    Bishop.new("white", self, [7,5]),
+    Knight.new("white", self, [7,6]),
+    Rook.new("white", self, [7,7], {"has_castled" => false, "can_castle" => true})
   ]
 
-  def initialize(grid = nil)
-    if grid.nil?
-      @grid = Array.new(8){Array.new(8){" "}}
+  def initialize(new_grid = nil)
+    @grid = Array.new(8){Array.new(8){" "}}
+    if new_grid.nil?
       set_board
       @w_king = @grid[7][4]
       @b_king = @grid[0][4]
     else
-
+      @grid.each_with_index do |row, idx1|
+        row.each_with_index do |tile, idx2|
+          piece = new_grid[idx1][idx2]
+          if piece["piece"] != "String"
+            @grid[idx1][idx2] = piece["piece"].constantize.new(
+              piece["color"],
+              self,
+              [idx1, idx2],
+              {"has_castled" => piece["has_castled"], "can_castle" => piece["can_castle"]})
+            if piece["piece"] == "King"
+              @w_king = @grid[idx1][idx2] if piece["color"] == "white"
+              @b_king = @grid[idx1][idx2] if piece["color"] == "black"
+            end
+          end
+        end
+      end
     end
   end
 

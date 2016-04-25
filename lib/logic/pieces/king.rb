@@ -2,12 +2,8 @@
 class King < Piece
   include SteppingPiece
 
-  attr_accessor :has_castled
-
-  def initialize(color = "white", board, curr_pos)
-    super(color, board, curr_pos)
-    @can_castle = true
-    @has_castled = false
+  def initialize(color, board, curr_pos, options = {"has_castled" => false, "can_castle" => false})
+    super(color, board, curr_pos, options)
   end
 
   def moves(board)
@@ -23,7 +19,7 @@ class King < Piece
     if @can_castle && @board[[@curr_pos[0], @curr_pos[1] - 4]].can_castle &&
       @board.is_empty?([@curr_pos[0], @curr_pos[1] - 1]) &&
       @board.is_empty?([@curr_pos[0], @curr_pos[1] - 2]) &&
-      @board.is_empty?([@curr_pos[0], @curr_pos[1] - 3]) 
+      @board.is_empty?([@curr_pos[0], @curr_pos[1] - 3])
       moves << [@curr_pos[0], @curr_pos[1] - 2]
     end
     moves

@@ -1,8 +1,8 @@
 class Knight < Piece
   include SteppingPiece
 
-  def initialize(color = "white", board, curr_pos)
-    super(color, board, curr_pos)
+  def initialize(color, board, curr_pos, options = {"has_castled" => false, "can_castle" => false})
+    super(color, board, curr_pos, options)
   end
 
   def moves(board)

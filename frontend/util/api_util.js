@@ -13,12 +13,12 @@ var ApiUtil = {
     });
   },
 
-  makeMove: function (board) {
+  makeMove: function (board, pos1, pos2) {
     $.ajax({
       type: "PATCH",
       url: "/api/play",
       dataType: "json",
-      data: {board: board},
+      data: {board: board, pos1: pos1, pos2: pos2},
       success: function (board) {
         BoardActions.receiveBoard(board);
       },

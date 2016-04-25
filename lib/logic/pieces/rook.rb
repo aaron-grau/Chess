@@ -1,9 +1,8 @@
 class Rook < Piece
   include SlidingPiece
 
-  def initialize(color = "white",board, curr_pos)
-    super(color, board, curr_pos)
-    @can_castle = true
+  def initialize(color, board, curr_pos, options = {"has_castled" => false, "can_castle" => false})
+    super(color, board, curr_pos, options)
   end
 
   def moves(board)
