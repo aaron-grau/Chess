@@ -35,6 +35,8 @@ BoardStore.__onDispatch = function (payload) {
       _mate = payload.mate;
       if (payload.lastMove) {
         _lastMove = payload.lastMove;
+      } else {
+        _lastMove = [[null, null], [null, null]];
       }
 			BoardStore.__emitChange();
 	}
