@@ -95,3 +95,30 @@ h1 {
   width: 50px;
   display: block;
 }
+
+footer {
+  color: #eee;
+  width: 600px;
+  margin: auto;
+  padding-top: 30px;
+  display: block;
+}
+
+.links-list {
+  padding-top: 20px;
+  display: block;
+  margin-left: 150px;
+}
+
+footer > ul > li {
+  float: left;
+  padding: 10px;
+  margin-right: 40px;
+  color: #4B6CCA;
+  display: inline-block;
+}
+
+footer > ul > li > a:hover {
+  cursor: pointer;
+  color: #000;
+}
