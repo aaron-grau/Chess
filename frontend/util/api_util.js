@@ -7,8 +7,10 @@ var ApiUtil = {
       type: "GET",
       url: "/api/play/new",
       dataType: "json",
-      success: function (board) {
-        BoardActions.receiveBoard(board);
+      success: function (board_status) {
+        var board = board_status.board;
+        var mate = board_status.mate;
+        BoardActions.receiveBoard(board, mate);
       },
     });
   },
@@ -19,8 +21,10 @@ var ApiUtil = {
       url: "/api/play",
       dataType: "json",
       data: {board: board, pos1: pos1, pos2: pos2},
-      success: function (board) {
-        BoardActions.receiveBoard(board);
+      success: function (board_status) {
+        var board = board_status.board;
+        var mate = board_status.mate;
+        BoardActions.receiveBoard(board, mate);
       },
     });
   }

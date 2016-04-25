@@ -18,7 +18,9 @@ var Home = React.createClass({
   },
 
   _restart: function () {
-    ApiUtil.fetchNewBoard();
+    if (this.state.turnMessage === "Your Turn!") {
+      ApiUtil.fetchNewBoard();
+    }
   },
 
   render: function() {

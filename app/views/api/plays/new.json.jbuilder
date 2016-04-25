@@ -18,4 +18,5 @@ pieces = []
   end
 end
 
-json.array! pieces
+json.board pieces
+json.mate @mate

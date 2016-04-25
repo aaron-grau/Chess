@@ -10,7 +10,7 @@ var HTML5Backend = require('react-dnd-html5-backend');
 var Board = React.createClass({
 
   getInitialState: function () {
-    return {board: BoardStore.get(), moved: false};
+    return {board: BoardStore.get(), moved: false, mate: false};
   },
 
   componentDidMount: function () {
@@ -23,7 +23,7 @@ var Board = React.createClass({
   },
 
   _boardChange: function () {
-    this.setState({board: BoardStore.get(), moved: false});
+    this.setState({board: BoardStore.get(), moved: false, mate: BoardStore.mate()});
     this.props.toggleMessage(true);
   },
 
@@ -93,9 +93,13 @@ var Board = React.createClass({
         {tiles[i]}
       </div>);
     }
-
+    var mate = <div></div>
+    if (this.state.mate) {
+      mate = <div className="mate-message">Checkmate!</div>
+    }
     return (
       <div id="board">
+        {mate}
         {rows}
       </div>
     );

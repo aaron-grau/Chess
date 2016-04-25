@@ -4,6 +4,7 @@
   padding-top: 30px;
 }
 #board {
+  position: relative;
   margin: auto;
   width: 400px;
   border: 2px solid #000;
@@ -74,6 +75,17 @@ h1 {
   text-align: center;
   margin-top: 20px;
   font-weight: bold;
+}
+
+.mate-message {
+  font-weight: bold;
+  display: block;
+  position: absolute;
+  top: 175px;
+  left: 75px;
+  color: #C80000;
+  z-index: 10;
+  font-size: 45px;
 }
 
 .piece-image {
