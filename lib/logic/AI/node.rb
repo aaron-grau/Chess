@@ -86,7 +86,14 @@ class Node
     piece_eval = evaluate_pieces(pieces) - evaluate_pieces(opp_pieces)
     development_eval = development(pieces, @color) - development(opp_pieces, @opp_color)
 
-    piece_eval + development_eval
+    piece_eval + development_eval + check_penalty(opp_pieces, pieces)
+  end
+
+  def check_penalty(opp_pieces, pieces)
+    val = 0
+    val = -1 if pieces.length < 4 && @board.in_check?(@color)
+
+    val
   end
 
   def development(pieces, color)
