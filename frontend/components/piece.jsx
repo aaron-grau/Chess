@@ -11,12 +11,8 @@ var pieceSource = {
     if (!monitor.didDrop() || props.color != "white") {
       return;
     }
-    // When dropped on a compatible target, do something.
-    // Read the original dragged item from getItem():
+
     var item = monitor.getItem();
-    // You may also read the drop result from the drop target
-    // that handled the drop, if it returned an object from
-    // its drop() method.
     var dropResult = monitor.getDropResult();
     pos1 = item.pos
     pos2 = dropResult.pos2
@@ -55,14 +51,11 @@ var Piece = React.createClass({
 
     return (
       connectDragSource(
-      <div style={{
-        opacity: isDragging ? 0 : 1,
-        fontSize: 25,
-        fontWeight: 'bold',
-        cursor: 'pointer'
-      }}>
-        <img className="piece-image" src={this.props.image} />
-      </div>
+        <img className="piece-image" src={this.props.image}
+        style={{
+          opacity: isDragging ? 0 : 1,
+          cursor: 'pointer'
+        }} />
     ));
   }
 

@@ -48,6 +48,7 @@ var Board = React.createClass({
       board[pos2[0]][pos2[1]] = board[pos1[0]][pos1[1]];
       board[pos1[0]][pos1[1]] = {piece: "String"};
       this._castle(pos1, pos2);
+      this._queen(pos2);
       this.setState({board: board, moved: true});
       this.props.toggleMessage(false);
     }
@@ -64,6 +65,14 @@ var Board = React.createClass({
         board[pos1[0]][pos1[1] - 1] = board[pos1[0]][pos1[1] - 4]
         board[pos1[0]][pos1[1] - 4] = {piece: "String"}
       }
+    }
+  },
+
+  _queen: function (pos2) {
+    var board = this.state.board;
+    var tile = board[pos2[0]][pos2[1]];
+    if (tile.piece === "Pawn" && (pos2[0] === 7 || pos2[0] === 0)) {
+      tile.image = tile.queen_img
     }
   },
 
