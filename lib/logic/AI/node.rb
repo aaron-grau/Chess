@@ -1,5 +1,3 @@
-require 'byebug'
-
 class Node
   include UndoMove
 
@@ -20,15 +18,13 @@ class Node
   end
 
 
-  def alpha_beta(ply, alpha, beta, cur_depth, counter)
+  def alpha_beta(ply, alpha, beta, cur_depth)
     @alpha = alpha
     @beta = beta
     @ply = ply
     @cur_depth = cur_depth
-    @counter = counter
     @no_moves = true
 
-    counter[:count] += 1
     return evaluate_pos if ply == 0
 
     pieces = []
@@ -200,7 +196,7 @@ class Node
     new_ply = @ply - 1
     new_ply = 1 if capture && new_ply == 0 && @cur_depth < 5
     cur_node = Node.new(@board, @opp_color, @color)
-    cur_eval = -1 * cur_node.alpha_beta(new_ply, -@beta, -@alpha, @cur_depth + 1, @counter)
+    cur_eval = -1 * cur_node.alpha_beta(new_ply, -@beta, -@alpha, @cur_depth + 1)
     undo_move
 
     if cur_eval > @alpha || @best_move.nil?

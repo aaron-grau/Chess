@@ -1,4 +1,3 @@
-require 'benchmark'
 
 class ComputerPlayer
   include UndoMove
@@ -24,7 +23,6 @@ class ComputerPlayer
     @alpha = -100000
     @beta = 100000
     pieces = []
-    @counter = {count: 0}
     @non_captures = []
 
     @board.grid.each do |row|
@@ -104,7 +102,7 @@ class ComputerPlayer
     end
 
     cur_node = Node.new(@board, @opp_color, @color)
-    cur_eval = -1 * cur_node.alpha_beta(depth, -@beta, -@alpha, 1, @counter)
+    cur_eval = -1 * cur_node.alpha_beta(depth, -@beta, -@alpha, 1)
     undo_move
 
     if cur_eval > @alpha || @best_move.nil?

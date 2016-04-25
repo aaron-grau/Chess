@@ -1,6 +1,4 @@
 require_relative 'cursorable'
-require 'byebug'
-
 class Display
   include Cursorable
   require 'colorize'

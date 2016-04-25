@@ -1,4 +1,4 @@
-require 'byebug'
+
 module SlidingPiece
 
     DIAG = [
