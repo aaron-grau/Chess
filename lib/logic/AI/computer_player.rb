@@ -66,8 +66,6 @@ class ComputerPlayer
 
     depth = 2
     depth = 4 if pieces < 10
-    depth = 5 if pieces < 6
-    depth = 6 if pieces < 5
 
     depth
   end
