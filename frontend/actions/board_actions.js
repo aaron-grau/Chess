@@ -4,11 +4,12 @@ var AppDispatcher = require('../dispatcher/dispatcher');
 
 var BoardActions = {
 
-  receiveBoard: function (board, mate) {
+  receiveBoard: function (board, mate, lastMove) {
     AppDispatcher.dispatch({
       actionType: BoardConstants.BOARD_RECEIVED,
       board: board,
-      mate: mate
+      mate: mate,
+      lastMove: lastMove
     });
   }
 

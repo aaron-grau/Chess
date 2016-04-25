@@ -57,6 +57,7 @@ h1 {
 }
 
 .tile {
+  box-sizing: border-box;
   width: 50px;
   height: 50px;
   float: left;
@@ -121,4 +122,13 @@ footer > ul > li {
 footer > ul > li > a:hover {
   cursor: pointer;
   color: #000;
+}
+
+.last-move-border {
+  border: 2px solid #FFFF00;
+}
+
+.last-move-border > .piece-image {
+  right: 2.5px;
+  bottom: 2px;
 }

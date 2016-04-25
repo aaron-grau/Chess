@@ -10,6 +10,7 @@ class Api::PlaysController < ApplicationController
     unless @mate
       computer = ComputerPlayer.new("black")
       cpu_move = computer.play_turn(@board)
+      @last_move = cpu_move
       @board.make_any_move(cpu_move[0], cpu_move[1])
       @mate = @board.is_mate?("white")
     end

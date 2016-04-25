@@ -23,6 +23,10 @@ function collect(connect, monitor) {
 var Tile = React.createClass({
 
   render: function() {
+    var lastMove = "";
+    if (this.props.lastMove) {
+      lastMove = "last-move-border";
+    }
     var piece = <div></div>;
     var connectDropTarget = this.props.connectDropTarget;
     var isOver = this.props.isOver;
@@ -37,7 +41,7 @@ var Tile = React.createClass({
     }
 
     return (connectDropTarget(
-        <div className={this.props.color + " tile"}>
+        <div className={this.props.color + " tile " + lastMove}>
           {piece}
           {isOver &&
             <div style={{

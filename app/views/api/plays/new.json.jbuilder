@@ -30,3 +30,4 @@ end
 
 json.board pieces
 json.mate @mate
+json.last_move @last_move

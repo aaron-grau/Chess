@@ -10,7 +10,8 @@ var ApiUtil = {
       success: function (board_status) {
         var board = board_status.board;
         var mate = board_status.mate;
-        BoardActions.receiveBoard(board, mate);
+        var lastMove = board_status.last_move;
+        BoardActions.receiveBoard(board, mate, lastMove);
       },
     });
   },
@@ -24,7 +25,8 @@ var ApiUtil = {
       success: function (board_status) {
         var board = board_status.board;
         var mate = board_status.mate;
-        BoardActions.receiveBoard(board, mate);
+        var lastMove = board_status.last_move;
+        BoardActions.receiveBoard(board, mate, lastMove);
       },
     });
   }

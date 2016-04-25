@@ -10,7 +10,7 @@ var HTML5Backend = require('react-dnd-html5-backend');
 var Board = React.createClass({
 
   getInitialState: function () {
-    return {board: BoardStore.get(), moved: false, mate: false};
+    return {board: BoardStore.get(), moved: false, mate: false, lastMove: [[null, null], [null, null]]};
   },
 
   componentDidMount: function () {
@@ -23,7 +23,12 @@ var Board = React.createClass({
   },
 
   _boardChange: function () {
-    this.setState({board: BoardStore.get(), moved: false, mate: BoardStore.mate()});
+    this.setState({
+      board: BoardStore.get(),
+      moved: false,
+      mate: BoardStore.mate(),
+      lastMove: BoardStore.lastMove()
+    });
     this.props.toggleMessage(true);
   },
 
@@ -49,7 +54,7 @@ var Board = React.createClass({
       board[pos1[0]][pos1[1]] = {piece: "String"};
       this._castle(pos1, pos2);
       this._queen(pos2);
-      this.setState({board: board, moved: true});
+      this.setState({board: board, moved: true, lastMove: [pos1, pos2]});
       this.props.toggleMessage(false);
     }
   },
@@ -82,6 +87,11 @@ var Board = React.createClass({
       tiles.push([])
       for (var j = 0; j < 8; j++) {
         var color = ((i + j) % 2) ? "dark" : "light";
+        var isLast = false
+        if ((i === this.state.lastMove[0][0] && j === this.state.lastMove[0][1]) ||
+          (i === this.state.lastMove[1][0] && j === this.state.lastMove[1][1])) {
+            isLast = true
+          }
         tiles[i].push(
           <Tile key={i + j*2}
           pos={[i, j]}
@@ -91,6 +101,7 @@ var Board = React.createClass({
           image={this.state.board[i][j].image}
           moves={this.state.board[i][j].moves}
           handleMove={this.handleMove}
+          lastMove={isLast}
           />
         )
       }

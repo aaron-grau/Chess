@@ -6,6 +6,7 @@ var BoardStore = new Store(AppDispatcher);
 
 var _board = [];
 var _mate = false;
+var _lastMove = [[null, null], [null, null]];
 
 for (var i = 0; i < 8; i++) {
   _board.push([]);
@@ -22,12 +23,19 @@ BoardStore.mate = function () {
   return _mate;
 };
 
+BoardStore.lastMove = function () {
+  return _lastMove;
+};
+
 
 BoardStore.__onDispatch = function (payload) {
 	switch (payload.actionType) {
 		case BoardConstants.BOARD_RECEIVED:
 			_board = payload.board;
       _mate = payload.mate;
+      if (payload.lastMove) {
+        _lastMove = payload.lastMove;
+      }
 			BoardStore.__emitChange();
 	}
 };
