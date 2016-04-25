@@ -1,7 +1,10 @@
 # Chess
 
-Play chess against a custom engine. Built using Ruby, Ruby on Rails and React.js.
+Play chess against a custom engine. Built using Ruby and React.js.
 
+[Play the here!][live]
+
+[live]: http://agchess.herokuapp.com
 
 ## Engine Implementation Details
 

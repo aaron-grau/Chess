@@ -43,7 +43,7 @@ var Home = React.createClass({
           </li>
           <li>
             ● The AI uses an evaluation function based off development and piece values to assign point totals to
-            positions at the end of each search branch, the values are passed back up the tree and use to assign point values to each current candidate move, the best move is then played
+            positions at the end of each search branch, the values are passed back up the tree and used to assign point values to each current candidate move, the best move is then played
           </li>
           </ul>
           <footer>
