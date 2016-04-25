@@ -2,7 +2,7 @@
 
 Play chess against a custom engine. Built using Ruby and React.js.
 
-[Play the here!][live]
+[Play here!][live]
 
 [live]: http://agchess.herokuapp.com
 
