@@ -112,9 +112,11 @@ class Board
   end
 
   def is_mate?(color)
-    return false unless in_check?(color)
+    in_check?(color) && legal_moves(color).empty?
+  end
 
-    legal_moves(color).empty?
+  def stalemate?(color)
+    !in_check? && legal_moves(color).empty?
   end
 
   def legal_moves(color)
