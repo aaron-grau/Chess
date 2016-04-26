@@ -90,7 +90,7 @@ class Node
 
   def check_penalty(opp_pieces, pieces)
     val = 0
-    val = -1 if pieces.length < 4 && @board.in_check?(@color)
+    val = -1 if pieces.length < 5 && @board.in_check?(@color)
 
     val
   end
@@ -200,7 +200,7 @@ class Node
     @q_castled = special_move == "q_castled"
 
     new_ply = @ply - 1
-    new_ply = 1 if capture && new_ply == 0 && @cur_depth < 4
+    new_ply = 1 if capture && new_ply == 0 && @cur_depth < 5
     cur_node = Node.new(@board, @opp_color, @color)
     cur_eval = -1 * cur_node.alpha_beta(new_ply, -@beta, -@alpha, @cur_depth + 1)
     undo_move
