@@ -115,7 +115,7 @@ class Node
       if piece.class == King
         val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 7
         #pawn in front of castled king bonus
-        if piece.has_castled
+        if piece.has_castled && piece.curr_pos[0] == 7
           val += 0.75
           if @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].class == Pawn &&
              @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].color == COLORS[0]
@@ -150,7 +150,7 @@ class Node
       end
       if piece.class == King
         val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 0
-        if piece.has_castled
+        if piece.has_castled && piece.curr_pos[0] == 0
           val += 0.75
           if @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].class == Pawn &&
              @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].color == COLORS[1]
