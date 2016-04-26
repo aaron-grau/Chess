@@ -116,7 +116,7 @@ class Board
   end
 
   def stalemate?(color)
-    !in_check? && legal_moves(color).empty?
+    !in_check?(color) && legal_moves(color).empty?
   end
 
   def legal_moves(color)
