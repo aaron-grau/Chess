@@ -59,8 +59,7 @@ class Node
     end
 
     if @no_moves
-      #stalemate
-      return 0
+      return evaluate_pos
     end
 
     return @alpha;

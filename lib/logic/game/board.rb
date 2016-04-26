@@ -1,6 +1,6 @@
 class Board
 
-  attr_accessor :grid
+  attr_accessor :grid, :b_king, :w_king
 
   BLACK_PIECES = [
     Rook.new("black", self, [0,0], {"has_castled" => false, "can_castle" => true}),
