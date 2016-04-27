@@ -1,4 +1,4 @@
-class Display::String
+class String
 
   def selected
     false
