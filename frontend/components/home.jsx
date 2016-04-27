@@ -24,10 +24,14 @@ var Home = React.createClass({
   },
 
   render: function() {
+    var disabled = "";
+    if (this.state.turnMessage === "I'm thinking of the best move...") {
+      disabled = "disabled";
+    }
     return (
       <div className="content">
         <h1>Chess Engine</h1>
-        <div className="restart" onClick={this._restart}>Restart Game</div>
+        <div className={"restart " + disabled}  onClick={this._restart}>Restart Game</div>
         <Board toggleMessage={this.toggleTurnMessage} />
         <div className="turn-message">{this.state.turnMessage}</div>
         <div className="about">

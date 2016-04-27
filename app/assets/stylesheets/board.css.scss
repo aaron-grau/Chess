@@ -32,6 +32,16 @@ h1 {
   background-color: #92D7AA;
 }
 
+.disabled {
+  opacity: .5;
+}
+
+.disabled:hover {
+  opacity: .5;
+  cursor: default;
+  background-color: #D7FFE5;
+}
+
 .about {
   width: 600px;
   margin: auto;
