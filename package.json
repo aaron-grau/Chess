@@ -19,6 +19,7 @@
     "react-click-outside": "^2.1.0",
     "react-dnd": "^2.1.4",
     "react-dnd-html5-backend": "^2.1.2",
+    "react-dnd-touch-backend": "^0.2.7",
     "react-dom": "^0.14.7",
     "react-modal": "^0.6.1",
     "react-modal-dialog": "^2.0.0",

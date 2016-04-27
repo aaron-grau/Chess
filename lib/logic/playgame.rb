@@ -1,4 +1,3 @@
-
 require_relative 'display/string'
 require_relative 'game/illegal_move_error'
 require_relative "display/display"
@@ -14,12 +13,16 @@ require_relative 'pieces/pawn'
 require_relative 'game/board'
 require_relative 'AI/undo_move'
 require_relative 'AI/node'
+require_relative 'game/game'
 require_relative 'game/human_player'
 require_relative 'AI/computer_player'
 
 require 'colorize'
+require 'byebug'
 
-class Playgame
-  def initialize
-  end
-end
+player1 = HumanPlayer.new("white")
+player2 = ComputerPlayer.new("black")
+
+game = Game.new(player1, player2)
+
+game.play_game

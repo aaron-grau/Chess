@@ -4,8 +4,13 @@ var BoardStore = require('../stores/board');
 var ApiUtil = require('../util/api_util');
 var Tile = require('./tile');
 var DragDropContext = require('react-dnd').DragDropContext;
+var TouchBackend = require('react-dnd-touch-backend');
 var HTML5Backend = require('react-dnd-html5-backend');
+var Backend = isTouchDevice() ? TouchBackend : HTML5Backend;
 
+function isTouchDevice() {
+  return 'ontouchstart' in window;
+}
 
 var Board = React.createClass({
 
@@ -127,4 +132,5 @@ var Board = React.createClass({
 
 });
 
-module.exports = DragDropContext(HTML5Backend)(Board);
+
+module.exports = DragDropContext(Backend)(Board);

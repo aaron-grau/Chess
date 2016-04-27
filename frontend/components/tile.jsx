@@ -3,9 +3,6 @@ var PropTypes = React.PropTypes;
 var DropTarget = require('react-dnd').DropTarget;
 var Piece = require('./piece');
 
-function movePiece(pos1, pos2) {
-
-}
 
 var squareTarget = {
   drop: function (props) {
