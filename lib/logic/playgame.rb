@@ -13,13 +13,3 @@ require_relative 'game/board'
 require_relative 'AI/undo_move'
 require_relative 'AI/node'
 require_relative 'AI/computer_player'
-
-require 'colorize'
-require 'byebug'
-
-player1 = HumanPlayer.new("white")
-player2 = ComputerPlayer.new("black")
-
-game = Game.new(player1, player2)
-
-game.play_game
