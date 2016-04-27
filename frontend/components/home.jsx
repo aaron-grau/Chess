@@ -42,7 +42,7 @@ var Home = React.createClass({
           </li>
           <li>
             ● The AI applies a minimax algorithm with alpha-beta
-            pruning to quickly evaluate over 10 million possible
+            pruning to quickly evaluate over 1 million possible
             future positions per turn
           </li>
           <li>
