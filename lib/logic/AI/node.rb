@@ -38,7 +38,6 @@ class Node
     return 0 if pieces.length < 4 && @board.stalemate?(@color)
 
     @non_captures = []
-
     pieces.each do |piece|
       moves = []
       piece_moves = []
