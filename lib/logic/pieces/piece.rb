@@ -86,6 +86,14 @@ class Piece
      @board.make_any_move(@curr_pos, one_right)
      flag = @board.in_check?(color)
      undo_move(true)
+     return true if flag
+
+     two_right = [@curr_pos[0], @curr_pos[1] + 2]
+     save_move(two_right)
+     @board.make_any_move(@curr_pos, two_right)
+     flag = @board.in_check?(color)
+     undo_move
+
      return flag
     end
 
@@ -95,6 +103,14 @@ class Piece
       @board.make_any_move(@curr_pos, one_left)
       flag = @board.in_check?(color)
       undo_move(true)
+      return true if flag
+
+      two_left = [@curr_pos[0], @curr_pos[1] - 2]
+      save_move(two_left)
+      @board.make_any_move(@curr_pos, two_left)
+      flag = @board.in_check?(color)
+      undo_move
+
       return flag
     end
   end
