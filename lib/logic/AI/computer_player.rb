@@ -18,42 +18,60 @@ class ComputerPlayer
   private
 
   def find_best_move
-    best_move = nil
-    best_eval = nil
+    @best_move = nil
+    @best_eval = nil
     @alpha = -100000
     @beta = 100000
-    pieces = []
+
+    pieces = get_pieces
     @non_captures = []
 
-    @board.grid.each do |row|
-      row.each do |tile|
-        pieces << tile if tile.class < Piece && tile.color == @color
-      end
+    #search captures first more likely for alpha spikes allowing for early returns
+    return_mate = test_moves(pieces)
+    return return_mate unless return_mate.nil?
+
+    return_mate = test_non_captures
+    return return_mate unless return_mate.nil?
+
+    @best_move
+  end
+
+  def test_non_captures
+    @non_captures.each do |move|
+      cur_eval = test_move(move)
+      return cur_eval if @mate_found
+      alpha_beta_checker(cur_eval, move)
     end
 
+    nil
+  end
+
+  def test_moves(pieces)
     pieces.each do |piece|
       moves = []
       piece_moves = []
-      piece_moves = piece.legal_moves(@board)
+      piece_moves = piece.moves(@board)
       piece_moves.each do |target|
         moves << [piece.curr_pos, target]
       end
       captures = sort_by_captures(moves)
-
       captures.each do |move|
-        return_move = test_move(move)
-        return return_move unless return_move.nil?
+        cur_eval = test_move(move)
+        return cur_eval if @mate_found
+        alpha_beta_checker(cur_eval, move)
       end
-
     end
 
-    @non_captures.each do |move|
-      return_move = test_move(move)
-      return return_move unless return_move.nil?
-    end
-
-    @best_move
+    nil
   end
+
+
+  def get_pieces
+    @board.grid.flatten.select do |tile|
+      tile.class < Piece && tile.color == @color
+    end
+  end
+
 
 
   def depth
@@ -87,28 +105,34 @@ class ComputerPlayer
   end
 
   def test_move(move)
-    @castle = false
-    @queened = false
+    @mate_found, @k_castled, @q_castled, @queened = false, false, false, false
+    #make move, get eval from child node, undo move
     save_move(move)
-    special_move = @board.make_any_move(move[0], move[1])
+    check_special_move(@board.make_any_move(move[0], move[1]))
+    #if mate stop and return mate
+    if @board.is_mate?(@opp_color)
+      undo_move
+      @mate_found = true
+      return move
+    end
+    cur_node = Node.new(@board, @opp_color, @color)
+    new_eval = -1 * cur_node.alpha_beta(depth, -@beta, -@alpha, 1)
+    undo_move
+
+    new_eval
+  end
+
+  def check_special_move(special_move)
     @queened = special_move == "queened"
     @k_castled = special_move == "k_castled"
     @q_castled = special_move == "q_castled"
-    if @board.is_mate?(@opp_color)
-      undo_move
-      return move
-    end
+  end
 
-    cur_node = Node.new(@board, @opp_color, @color)
-    cur_eval = -1 * cur_node.alpha_beta(depth, -@beta, -@alpha, 1)
-    undo_move
-
-    if cur_eval > @alpha || @best_move.nil?
-      @best_move = move
+  def alpha_beta_checker(cur_eval, move)
+    if cur_eval > @alpha
       @alpha = cur_eval
+      @best_move = move
     end
-
-    nil
   end
 
 
