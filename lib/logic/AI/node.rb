@@ -12,32 +12,46 @@ class Node
 
   COLORS = ["white", "black"]
   def initialize(board, color, opp_color)
-    @board = board
-    @color = color
-    @opp_color = opp_color
+    @board, @color, @opp_color = board, color, opp_color
   end
 
 
   def alpha_beta(ply, alpha, beta, cur_depth)
-    @alpha = alpha
-    @beta = beta
-    @ply = ply
-    @cur_depth = cur_depth
-    @no_moves = true
+    @alpha, @beta, @ply, @cur_depth, @no_moves = alpha, beta, ply, cur_depth, true
+    #reached end of set tree search evaluate and return
+    return evaluate_pos if @ply == 0
 
-    return evaluate_pos if ply == 0
-
-    pieces = []
-
-    @board.grid.each do |row|
-      row.each do |tile|
-        pieces << tile if tile.class < Piece && tile.color == @color
-      end
-    end
-
+    pieces = get_pieces
     return 0 if pieces.length < 4 && @board.stalemate?(@color)
 
     @non_captures = []
+    #search captures first more likely for alpha spikes allowing for early returns
+
+    return_early = test_moves(pieces)
+    return return_early unless return_early.nil?
+
+    return_early = test_non_captures
+    return return_early unless return_early.nil?
+
+    #if no moves exist evaluate and return
+    return evaluate_pos if @no_moves
+
+    @alpha
+  end
+
+  private
+
+  def test_non_captures
+    @non_captures.each do |move|
+      cur_eval = test_move(move)
+      return_early = alpha_beta_checker(cur_eval)
+      return return_early unless return_early.nil?
+    end
+
+    nil
+  end
+
+  def test_moves(pieces)
     pieces.each do |piece|
       moves = []
       piece_moves = []
@@ -53,20 +67,14 @@ class Node
       end
     end
 
-    @non_captures.each do |move|
-      cur_eval = test_move(move)
-      return_early = alpha_beta_checker(cur_eval)
-      return return_early unless return_early.nil?
-    end
-
-    if @no_moves
-      return evaluate_pos
-    end
-
-    return @alpha;
+    nil
   end
 
-  private
+  def get_pieces
+    @board.grid.flatten.select do |tile|
+      tile.class < Piece && tile.color == @color
+    end
+  end
 
   def evaluate_pos
     pieces = []
@@ -191,27 +199,29 @@ class Node
   end
 
   def test_move(move, capture = false)
-    @no_moves = false
-    @castle = false
-    @queened = false
+    @no_moves, @k_castled, @q_castled, @queened = false, false, false, false
+
+    #make move, get eval from child node, undo move
     save_move(move)
-    special_move = @board.make_any_move(move[0], move[1])
+    check_special_move(@board.make_any_move(move[0], move[1]))
+    new_node = Node.new(@board, @opp_color, @color)
+    new_eval = -1 * new_node.alpha_beta(new_ply(capture), -@beta, -@alpha, @cur_depth + 1)
+    undo_move
+
+    new_eval
+  end
+
+  def check_special_move(special_move)
     @queened = special_move == "queened"
     @k_castled = special_move == "k_castled"
     @q_castled = special_move == "q_castled"
+  end
 
+  def new_ply(capture)
     new_ply = @ply - 1
     new_ply = 1 if capture && new_ply == 0 && @cur_depth < 4
-    cur_node = Node.new(@board, @opp_color, @color)
-    cur_eval = -1 * cur_node.alpha_beta(new_ply, -@beta, -@alpha, @cur_depth + 1)
-    undo_move
 
-    if cur_eval > @alpha || @best_move.nil?
-      @best_move = move
-      @alpha = cur_eval
-    end
-
-    cur_eval
+    new_ply
   end
 
   def sort_by_captures(moves)
