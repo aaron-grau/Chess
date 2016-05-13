@@ -12,31 +12,16 @@ The AI implements a minimax tree to evaluate its position and find the best move
 
 ```
 def test_move(move, capture = false)
-  @no_moves = false
-  @castle = false
-  @queened = false
-  save_move(move)
-  special_move = @board.make_any_move(move[0], move[1])
-  #check to see if a 'special move' has occurred so it can be undone on way up tree
-  @queened = special_move == "queened"
-  @k_castled = special_move == "k_castled"
-  @q_castled = special_move == "q_castled"
+  @no_moves, @k_castled, @q_castled, @queened = false, false, false, false
 
-  new_ply = @ply - 1
-  #go deeper if line ends with capture
-  new_ply += 1 if capture && @cur_depth < 5 && new_ply == 0
-  #make a new node
-  cur_node = Node.new(@board, @opp_color, @color)
-  cur_eval = -1 * cur_node.alpha_beta(new_ply, -@beta, -@alpha, @cur_depth + 1, @counter)
+  #make move, get eval from child node, undo move
+  save_move(move)
+  check_special_move(@board.make_any_move(move[0], move[1]))
+  new_node = Node.new(@board, @opp_color, @color)
+  new_eval = -1 * new_node.alpha_beta(new_ply(capture), -@beta, -@alpha, @cur_depth + 1)
   undo_move
 
-  #set alpha and best move to the current move if its better than previously found best move
-  if cur_eval > @alpha || @best_move.nil?
-    @best_move = move
-    @alpha = cur_eval
-  end
-
-  cur_eval
+  new_eval
 end
 ```
 
