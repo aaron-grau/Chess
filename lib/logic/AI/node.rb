@@ -76,20 +76,15 @@ class Node
     end
   end
 
-  def evaluate_pos
-    pieces = []
-    @board.grid.each do |row|
-      row.each do |square|
-        pieces << square if square != " " && square.color == @color
-      end
+  def get_opp_pieces
+    @board.grid.flatten.select do |tile|
+      tile.class < Piece && tile.color == @opp_color
     end
+  end
 
-    opp_pieces = []
-    @board.grid.each do |row|
-      row.each do |square|
-        opp_pieces << square if square != " " && square.color == @opp_color
-      end
-    end
+  def evaluate_pos
+    pieces = get_pieces
+    opp_pieces = get_opp_pieces
 
     piece_eval = evaluate_pieces(pieces) - evaluate_pieces(opp_pieces)
     development_eval = development(pieces, @color) - development(opp_pieces, @opp_color)
@@ -111,35 +106,61 @@ class Node
   def white_dev(pieces)
     val = 0
     pieces.each do |piece|
-      #value pawn advancement different than normal developmenet
-      if piece.class == Pawn
-        val += 0.005 * (6 - piece.curr_pos[0]).abs
-        val += 0.2 if piece.curr_pos[0] == 1 || piece.curr_pos[0] == 2
-      elsif piece.class == Knight || piece.class == Bishop
-        val += 0.25 if piece.curr_pos[0] < 6
-      elsif piece.class == Queen
-        val += 0.1 if piece.curr_pos[0] < 6
-      end
+      val += w_piece_dev(piece)
       #king on back rank bonus on crowded board
       if piece.class == King
-        val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 7
-        #pawn in front of castled king bonus
-        if piece.has_castled && piece.curr_pos[0] == 7
-          val += 0.75
-          if @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].class == Pawn &&
-             @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].color == COLORS[0]
-            val += 1
-          end
-          if @board[[piece.curr_pos[0] - 2, piece.curr_pos[1]]].class == Pawn &&
-             @board[[piece.curr_pos[0] - 2, piece.curr_pos[1]]].color == COLORS[0]
-            val += 0.75
-          end
-        end
+        val += w_king_safety(piece, pieces)
       else
-        #centralized pieces bonus
-        if piece.curr_pos[0] < 6 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
-          val += 0.05
-        end
+        val += w_piece_centralized(piece)
+      end
+    end
+
+    val
+  end
+
+  def w_piece_centralized(piece)
+    val = 0
+    if piece.curr_pos[0] < 6 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
+      val = 0.05
+    end
+
+    val
+  end
+
+  def w_piece_dev(piece)
+    val = 0
+    if piece.class == Pawn
+      val += w_pawn_dev(piece)
+    elsif piece.class == Knight || piece.class == Bishop
+      val += 0.25 if piece.curr_pos[0] < 6
+    elsif piece.class == Queen
+      val += 0.1 if piece.curr_pos[0] < 6
+    end
+
+    val
+  end
+
+  def w_pawn_dev(pawn)
+    val = 0
+    val += 0.005 * (6 - pawn.curr_pos[0]).abs
+    val += 0.2 if pawn.curr_pos[0] == 1 || pawn.curr_pos[0] == 2
+
+    val
+  end
+
+  def w_king_safety(piece, pieces)
+    val = 0
+    val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 7
+    #pawn in front of castled king bonus
+    if piece.has_castled && piece.curr_pos[0] == 7
+      val += 0.75
+      if @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].class == Pawn &&
+         @board[[piece.curr_pos[0] - 1, piece.curr_pos[1]]].color == COLORS[0]
+        val += 1
+      end
+      if @board[[piece.curr_pos[0] - 2, piece.curr_pos[1]]].class == Pawn &&
+         @board[[piece.curr_pos[0] - 2, piece.curr_pos[1]]].color == COLORS[0]
+        val += 0.75
       end
     end
 
@@ -149,31 +170,60 @@ class Node
   def black_dev(pieces)
     val = 0
     pieces.each do |piece|
-      if piece.class == Pawn
-        val += 0.005 * (piece.curr_pos[0] - 1)
-        val += 0.2 if piece.curr_pos[0] == 6 || piece.curr_pos[0] == 5
-      elsif piece.class == Knight || piece.class == Bishop
-        val += 0.2 if piece.curr_pos[0] > 1
-      elsif piece.class == Queen
-        val += 0.1 if piece.curr_pos[0] > 1
-      end
+      val += b_piece_dev(piece)
+      #king on back rank bonus on crowded board
       if piece.class == King
-        val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 0
-        if piece.has_castled && piece.curr_pos[0] == 0
-          val += 0.75
-          if @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].class == Pawn &&
-             @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].color == COLORS[1]
-            val += 1
-          end
-          if @board[[piece.curr_pos[0] + 2, piece.curr_pos[1]]].class == Pawn &&
-             @board[[piece.curr_pos[0] + 2, piece.curr_pos[1]]].color == COLORS[1]
-            val += 0.75
-          end
-        end
+        val += b_king_safety(piece, pieces)
       else
-        if piece.curr_pos[0] > 1 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
-          val += 0.05
-        end
+        val += b_piece_centralized(piece)
+      end
+    end
+
+    val
+  end
+
+  def b_piece_centralized(piece)
+    val = 0
+    if piece.curr_pos[0] > 1 && piece.curr_pos[1] > 1 && piece.curr_pos[1] < 6
+      val += 0.05
+    end
+
+    val
+  end
+
+  def b_piece_dev(piece)
+    val = 0
+    if piece.class == Pawn
+      val += b_pawn_dev(piece)
+    elsif piece.class == Knight || piece.class == Bishop
+      val += 0.25 if piece.curr_pos[0] > 1
+    elsif piece.class == Queen
+      val += 0.1 if piece.curr_pos[0] > 1
+    end
+
+    val
+  end
+
+  def b_pawn_dev(pawn)
+    val = 0
+    val += 0.005 * (pawn.curr_pos[0] - 1)
+    val += 0.2 if pawn.curr_pos[0] == 6 || pawn.curr_pos[0] == 5
+
+    val
+  end
+
+  def b_king_safety(piece, pieces)
+    val = 0
+    val += 0.5 if pieces.length > 9 && piece.curr_pos[0] == 0
+    if piece.has_castled && piece.curr_pos[0] == 0
+      val += 0.75
+      if @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].class == Pawn &&
+         @board[[piece.curr_pos[0] + 1, piece.curr_pos[1]]].color == COLORS[1]
+        val += 1
+      end
+      if @board[[piece.curr_pos[0] + 2, piece.curr_pos[1]]].class == Pawn &&
+         @board[[piece.curr_pos[0] + 2, piece.curr_pos[1]]].color == COLORS[1]
+        val += 0.75
       end
     end
 

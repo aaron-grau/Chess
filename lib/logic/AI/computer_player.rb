@@ -18,14 +18,9 @@ class ComputerPlayer
   private
 
   def find_best_move
-    @best_move = nil
-    @best_eval = nil
-    @alpha = -100000
-    @beta = 100000
-
+    @best_move, @best_eval, @alpha, @beta = nil, nil, -100000, 100000
     pieces = get_pieces
     @non_captures = []
-
     #search captures first more likely for alpha spikes allowing for early returns
     return_mate = test_moves(pieces)
     return return_mate unless return_mate.nil?
