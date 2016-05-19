@@ -1,8 +1,10 @@
 class Board
 
+  # always use these methods rather than ivar
   attr_accessor :grid, :b_king, :w_king
 
   BLACK_PIECES = [
+    # use symbols rather than strings
     Rook.new("black", self, [0,0], {"has_castled" => false, "can_castle" => true}),
     Knight.new("black", self, [0,1]),
     Bishop.new("black", self, [0,2]),
@@ -24,30 +26,31 @@ class Board
     Rook.new("white", self, [7,7], {"has_castled" => false, "can_castle" => true})
   ]
 
+
+  # Simpler way to setup board
+  # BACK_ROW = [
+  #   Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook
+  # ]
+  #0
+  # def setup_board
+  #   [:white, :black].each do |color|
+  #     BACK_ROW.each_with_index do |piece, col|
+  #       row = color == :white ? 7 : 0
+  #       piece.new(, self, [row, col])
+  #     end
+  #   end
+  # end
+
   def initialize(new_grid = nil)
     @grid = Array.new(8){Array.new(8){" "}}
     if new_grid.nil?
       set_board
-      @w_king = @grid[7][4]
-      @b_king = @grid[0][4]
+      w_king = @grid[7][4]
+      b_king = @grid[0][4]
     else
       #reads in json board sent from front end and converts to ruby board
-      @grid.each_with_index do |row, idx1|
-        row.each_with_index do |tile, idx2|
-          piece = new_grid[idx1][idx2]
-          if piece["piece"] != "String"
-            @grid[idx1][idx2] = piece["piece"].constantize.new(
-              piece["color"],
-              self,
-              [idx1, idx2],
-              {"has_castled" => piece["has_castled"], "can_castle" => piece["can_castle"]})
-            if piece["piece"] == "King"
-              @w_king = @grid[idx1][idx2] if piece["color"] == "white"
-              @b_king = @grid[idx1][idx2] if piece["color"] == "black"
-            end
-          end
-        end
-      end
+      # make_new_board_from_json
+      make_board_from_json(new_grid)
     end
   end
 
@@ -67,6 +70,7 @@ class Board
     new_board.grid.each_with_index do |row, idx1|
       row.each_with_index do |tile, idx2|
         if grid[idx1][idx2].class < Piece
+          # use bracket methods
           new_board[[idx1, idx2]] = grid[idx1][idx2].dup(new_board)
         else
           new_board[[idx1, idx2]] = grid[idx1][idx2].dup
@@ -94,7 +98,8 @@ class Board
   end
 
   def in_check?(color)
-    king_pos = color == "white" ? @w_king.curr_pos : @b_king.curr_pos
+    # don't use ivars
+    king_pos = color == "white" ? w_king.curr_pos : b_king.curr_pos
 
     opp_pieces = []
     @grid.each do |row|
@@ -110,6 +115,7 @@ class Board
 
   def is_empty?(pos)
     row, col = pos
+    # use bracket methods
     !in_bounds?(pos) || @grid[row][col] == " "
   end
 
@@ -153,6 +159,15 @@ class Board
     all_moves
   end
 
+  # def squares
+  #   grid.flatten
+  # end
+
+  # def pieces
+  #   # use nil for empty squares
+  #   grid.flatten.compact
+  # end
+
   def legal_moves_with_start(color)
     legal_moves = []
 
@@ -184,7 +199,9 @@ class Board
       return castled unless castled.nil?
     end
 
-    force_move(start_pos, end_pos)
+    move!(start_pos, end_pos)
+
+    # call a method to handle queening logic
     return "queened" if queened?(start_piece, end_row, end_col, end_pos)
     start_piece.curr_pos = end_pos
 
@@ -197,7 +214,8 @@ class Board
 
   private
 
-  def force_move(start_pos, end_pos)
+  # def move!
+  def move!(start_pos, end_pos)
     start_row, start_col = start_pos
     end_row, end_col = end_pos
     @grid[end_row][end_col] = @grid[start_row][start_col]
@@ -234,6 +252,7 @@ class Board
     end
   end
 
+  # def castle!
   def castling(king, start_pos, end_pos)
     start_row, start_col = start_pos
     end_row, end_col = end_pos
@@ -251,6 +270,7 @@ class Board
     nil
   end
 
+  # castle_kingside!
   def k_castle(king, start_pos, end_pos)
     start_row, start_col = start_pos
     end_row, end_col = end_pos
@@ -259,6 +279,7 @@ class Board
     @grid[start_row][start_col + 1] = rook
     rook.curr_pos = [start_row, start_col + 1]
     king.has_castled = true
+    # leverage #move!
     @grid[end_row][end_col] = @grid[start_row][start_col]
     @grid[start_row][start_col] = " "
     king.curr_pos = end_pos
@@ -277,6 +298,27 @@ class Board
     @grid[start_row][start_col] = " "
     king.curr_pos = end_pos
     king.can_castle = false
+  end
+
+  def make_new_board_from_json
+    @grid.each_with_index do |row, idx1|
+      row.each_with_index do |tile, idx2|
+        piece = new_grid[idx1][idx2]
+        # absence of a piece should be indicated by null
+        if piece["piece"] != "String"
+          @grid[idx1][idx2] = piece["piece"].constantize.new(
+            piece["color"],
+            self,
+            [idx1, idx2],
+            {"has_castled" => piece["has_castled"], "can_castle" => piece["can_castle"]})
+          if piece["piece"] == "King"
+            # use your bracket methods
+            w_king = @grid[idx1][idx2] if piece["color"] == "white"
+            b_king = @grid[idx1][idx2] if piece["color"] == "black"
+          end
+        end
+      end
+    end
   end
 
 end
