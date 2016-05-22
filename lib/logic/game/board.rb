@@ -81,7 +81,7 @@ class Board
 
   def all_moves_with_start(color)
     all_moves = []
-    pieces = pieces(color)
+    pieces = get_pieces(color)
 
     pieces.each do |piece|
        piece_moves = piece.moves(self)
@@ -96,10 +96,7 @@ class Board
   def legal_moves_with_start(color)
     legal_moves = []
 
-    pieces =
-      @grid.flatten.select do |tile|
-        tile.class < Piece && tile.color == color
-      end
+    pieces = get_pieces(color)
 
     pieces.each do |piece|
        piece_moves = piece.legal_moves(self)
@@ -114,7 +111,7 @@ class Board
   def make_any_move(start_pos, end_pos, real_board_move = false)
     start_row, start_col = start_pos
     end_row, end_col = end_pos
-    start_piece = @grid[start_row][start_col]
+    start_piece = self[[start_row, start_col]]
 
     legal_move?(start_pos, end_pos) if real_board_move
     start_piece.can_castle = false if start_piece.class == Rook
@@ -138,15 +135,13 @@ class Board
   private
 
   def move!(start_pos, end_pos)
-    start_row, start_col = start_pos
-    end_row, end_col = end_pos
-    @grid[end_row][end_col] = @grid[start_row][start_col]
-    @grid[start_row][start_col] = " "
+    self[end_pos] = self[start_pos]
+    self[start_pos] = " "
   end
 
   def queened?(start_piece, end_row, end_col, end_pos)
     if start_piece.class == Pawn && (end_row == 0 || end_row == 7)
-      @grid[end_row][end_col] = Queen.new(start_piece.color, self, end_pos)
+      self[end_pos] = Queen.new(start_piece.color, self, end_pos)
       return true
     end
 
@@ -154,12 +149,12 @@ class Board
   end
 
   def set_board
-    @grid.each_index do |idx|
+    grid.each_index do |idx|
       case idx
       when 0
-        @grid[idx] = BLACK_PIECES
+        self.grid[idx] = BLACK_PIECES
       when 7
-        @grid[idx] = WHITE_PIECES
+        self.grid[idx] = WHITE_PIECES
       when 1
         set_pawns("black",idx)
       when 6
@@ -169,65 +164,51 @@ class Board
   end
 
   def set_pawns(color, row)
-    @grid[row].each_index do |idx2|
-      @grid[row][idx2] = Pawn.new(color, self, [row,idx2])
+    grid[row].each_index do |col|
+      self[[row, col]] = Pawn.new(color, self, [row, col])
     end
   end
 
   def castling(king, start_pos, end_pos)
     start_row, start_col = start_pos
     end_row, end_col = end_pos
+    king.can_castle = false
 
     if end_col == 6 && start_col == 4
-      k_castle(king, start_pos, end_pos)
+      castle!(king, start_pos, end_pos, 3, 1)
       return "k_castled"
     elsif end_col == 2 && start_col == 4
-      q_castle(king, start_pos, end_pos)
+      castle!(king, start_pos, end_pos, -4, -1)
       return "q_castled"
-    else
-      king.can_castle = false
     end
 
     nil
   end
 
-  def k_castle(king, start_pos, end_pos)
+  def castle!(king, start_pos, end_pos, rook_start, rook_end)
     start_row, start_col = start_pos
     end_row, end_col = end_pos
-    rook = @grid[start_row][start_col + 3]
-    @grid[start_row][start_col + 3] = " "
-    @grid[start_row][start_col + 1] = rook
-    rook.curr_pos = [start_row, start_col + 1]
-    king.has_castled = true
-    @grid[end_row][end_col] = @grid[start_row][start_col]
-    @grid[start_row][start_col] = " "
-    king.curr_pos = end_pos
-    king.can_castle = false
-  end
 
-  def q_castle(king, start_pos, end_pos)
-    start_row, start_col = start_pos
-    end_row, end_col = end_pos
-    rook = @grid[start_row][start_col - 4]
-    @grid[start_row][start_col - 4] = " "
-    @grid[start_row][start_col - 1] = rook
-    rook.curr_pos = [start_row, start_col - 1]
+    rook = self[[start_row, start_col + rook_start]]
+    move!([start_row, start_col + rook_start], [start_row, start_col + rook_end])
+    rook.curr_pos = [start_row, start_col + rook_end]
+
     king.has_castled = true
-    @grid[end_row][end_col] = @grid[start_row][start_col]
-    @grid[start_row][start_col] = " "
+    move!(start_pos, end_pos)
     king.curr_pos = end_pos
+
     king.can_castle = false
   end
 
   def board_from_json(new_board)
-    grid.each_with_index do |row, idx1|
-      row.each_with_index do |tile, idx2|
-        piece = new_board[idx1][idx2]
+    grid.each_with_index do |row, row_idx|
+      row.each_with_index do |tile, col|
+        piece = new_board[row_idx][col]
         if piece["piece"] != "String"
-          self[[idx1, idx2]] = create_piece_from_json(piece, idx1, idx2)
+          self[[row_idx, col]] = create_piece_from_json(piece, row_idx, col)
           if piece["piece"] == "King"
-            @w_king = self[[idx1, idx2]] if piece["color"] == "white"
-            @b_king = self[[idx1, idx2]] if piece["color"] == "black"
+            @w_king = self[[row_idx, col]] if piece["color"] == "white"
+            @b_king = self[[row_idx, col]] if piece["color"] == "black"
           end
         end
       end
