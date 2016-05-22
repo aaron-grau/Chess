@@ -1,5 +1,7 @@
-
 class ComputerPlayer
+  attr_accessor :color, :opp_color, :best_move, :board, :best_eval, :alpha, :beta,
+    :non_captures, :mate_found, :k_castled, :q_castled, :queened
+
   include UndoMove
 
   COLORS = ["white", "black"]
@@ -29,13 +31,13 @@ class ComputerPlayer
     return_mate = test_non_captures
     return return_mate unless return_mate.nil?
 
-    @best_move
+    best_move
   end
 
   def test_non_captures
-    @non_captures.each do |move|
+    non_captures.each do |move|
       cur_eval = test_move(move)
-      return cur_eval if @mate_found
+      return cur_eval if mate_found
       alpha_beta_checker(cur_eval, move)
     end
 
@@ -53,7 +55,7 @@ class ComputerPlayer
       captures = sort_by_captures(moves)
       captures.each do |move|
         cur_eval = test_move(move)
-        return cur_eval if @mate_found
+        return cur_eval if mate_found
         alpha_beta_checker(cur_eval, move)
       end
     end
@@ -63,37 +65,27 @@ class ComputerPlayer
 
 
   def get_pieces
-    @board.grid.flatten.select do |tile|
-      tile.class < Piece && tile.color == @color
-    end
+    board.get_pieces(color)
   end
 
-
-
   def depth
-    pieces = 0
-    @board.grid.each do |row|
-      row.each do |tile|
-        pieces += 1 if tile.class < Piece
-      end
-    end
+    piece_count = get_pieces.count + board.get_pieces(opp_color).count
 
     depth = 2
-    depth = 3 if pieces < 10
-    depth = 4 if pieces < 5
+    depth = 3 if piece_count < 10
+    depth = 4 if piece_count < 5
 
     depth
   end
 
   def sort_by_captures(moves)
     captures = []
-    non_captures = []
 
     moves.each_with_index do |move, idx|
-      if @board[move[1]].class < Piece
+      if board[move[1]].class < Piece
         captures << move
       else
-        @non_captures << move
+        non_captures << move
       end
     end
 
