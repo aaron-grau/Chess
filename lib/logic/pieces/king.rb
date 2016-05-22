@@ -8,9 +8,9 @@ class King < Piece
 
   def moves(board)
     @board = board
-    moves = move_king(@curr_pos)
-    moves << [@curr_pos[0], @curr_pos[1] + 2] if king_side_castle_legal?
-    moves << [@curr_pos[0], @curr_pos[1] - 2] if queen_side_castle_legal?
+    moves = move_king(curr_pos)
+    moves << [curr_pos[0], curr_pos[1] + 2] if king_side_castle_legal?
+    moves << [curr_pos[0], curr_pos[1] - 2] if queen_side_castle_legal?
 
     moves
   end
@@ -25,15 +25,15 @@ class King < Piece
   end
 
   def king_side_castle_legal?
-    @can_castle && @board[[@curr_pos[0], @curr_pos[1] + 3]].can_castle &&
-      @board.is_empty?([@curr_pos[0], @curr_pos[1] + 1]) &&
-      @board.is_empty?([@curr_pos[0], @curr_pos[1] + 2])
+    can_castle && board[[curr_pos[0], curr_pos[1] + 3]].can_castle &&
+      board.is_empty?([curr_pos[0], curr_pos[1] + 1]) &&
+      board.is_empty?([curr_pos[0], curr_pos[1] + 2])
   end
 
   def queen_side_castle_legal?
-    @can_castle && @board[[@curr_pos[0], @curr_pos[1] - 4]].can_castle &&
-      @board.is_empty?([@curr_pos[0], @curr_pos[1] - 1]) &&
-      @board.is_empty?([@curr_pos[0], @curr_pos[1] - 2]) &&
-      @board.is_empty?([@curr_pos[0], @curr_pos[1] - 3])
+    can_castle && board[[curr_pos[0], curr_pos[1] - 4]].can_castle &&
+      board.is_empty?([curr_pos[0], curr_pos[1] - 1]) &&
+      board.is_empty?([curr_pos[0], curr_pos[1] - 2]) &&
+      board.is_empty?([curr_pos[0], curr_pos[1] - 3])
   end
 end
