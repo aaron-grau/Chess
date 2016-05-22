@@ -79,6 +79,7 @@ class Board
     legal_moves
   end
 
+  #returns all moves for all pieces of a color paired with the piece's current location
   def all_moves_with_start(color)
     all_moves = []
     pieces = get_pieces(color)
@@ -154,7 +155,7 @@ class Board
       when 7
         self.grid[idx] = WHITE_PIECES
       when 1
-        set_pawns(COLORS[1],idx)
+        set_pawns(COLORS[1], idx)
       when 6
         set_pawns(COLORS[0], idx)
       end
@@ -204,10 +205,7 @@ class Board
         piece = new_board[row_idx][col]
         if piece["piece"] != "String"
           self[[row_idx, col]] = create_piece_from_json(piece, row_idx, col)
-          if piece["piece"] == "King"
-            @w_king = self[[row_idx, col]] if piece["color"] == COLORS[0]
-            @b_king = self[[row_idx, col]] if piece["color"] == COLORS[1]
-          end
+          set_king_from_json(piece, row_idx, col)
         end
       end
     end
@@ -220,6 +218,13 @@ class Board
       [row, col],
       {has_castled: piece["has_castled"], can_castle: piece["can_castle"]}
     )
+  end
+
+  def set_king_from_json(piece, row_idx, col)
+    if piece["piece"] == "King"
+      @w_king = self[[row_idx, col]] if piece["color"] == COLORS[0]
+      @b_king = self[[row_idx, col]] if piece["color"] == COLORS[1]
+    end
   end
 
 end
