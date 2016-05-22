@@ -2,52 +2,14 @@ class Board
 
   attr_accessor :grid, :b_king, :w_king
 
-  BLACK_PIECES = [
-    Rook.new("black", self, [0,0], {"has_castled" => false, "can_castle" => true}),
-    Knight.new("black", self, [0,1]),
-    Bishop.new("black", self, [0,2]),
-    Queen.new("black", self, [0,3]),
-    King.new("black", self, [0,4], {"has_castled" => false, "can_castle" => true}),
-    Bishop.new("black", self, [0,5]),
-    Knight.new("black", self, [0,6]),
-    Rook.new("black", self, [0,7], {"has_castled" => false, "can_castle" => true})
-  ]
-
-  WHITE_PIECES = [
-    Rook.new("white", self, [7,0], {"has_castled" => false, "can_castle" => true}),
-    Knight.new("white", self, [7,1]),
-    Bishop.new("white", self, [7,2]),
-    Queen.new("white", self, [7,3]),
-    King.new("white", self, [7,4], {"has_castled" => false, "can_castle" => true}),
-    Bishop.new("white", self, [7,5]),
-    Knight.new("white", self, [7,6]),
-    Rook.new("white", self, [7,7], {"has_castled" => false, "can_castle" => true})
-  ]
-
   def initialize(new_grid = nil)
     @grid = Array.new(8){Array.new(8){" "}}
     if new_grid.nil?
       set_board
-      @w_king = @grid[7][4]
-      @b_king = @grid[0][4]
+      @w_king = self[[7, 4]]
+      @b_king = self[[0, 4]]
     else
-      #reads in json board sent from front end and converts to ruby board
-      @grid.each_with_index do |row, idx1|
-        row.each_with_index do |tile, idx2|
-          piece = new_grid[idx1][idx2]
-          if piece["piece"] != "String"
-            @grid[idx1][idx2] = piece["piece"].constantize.new(
-              piece["color"],
-              self,
-              [idx1, idx2],
-              {"has_castled" => piece["has_castled"], "can_castle" => piece["can_castle"]})
-            if piece["piece"] == "King"
-              @w_king = @grid[idx1][idx2] if piece["color"] == "white"
-              @b_king = @grid[idx1][idx2] if piece["color"] == "black"
-            end
-          end
-        end
-      end
+      board_from_json(new_grid)
     end
   end
 
@@ -184,7 +146,7 @@ class Board
       return castled unless castled.nil?
     end
 
-    force_move(start_pos, end_pos)
+    move!(start_pos, end_pos)
     return "queened" if queened?(start_piece, end_row, end_col, end_pos)
     start_piece.curr_pos = end_pos
 
@@ -197,7 +159,7 @@ class Board
 
   private
 
-  def force_move(start_pos, end_pos)
+  def move!(start_pos, end_pos)
     start_row, start_col = start_pos
     end_row, end_col = end_pos
     @grid[end_row][end_col] = @grid[start_row][start_col]
@@ -277,6 +239,26 @@ class Board
     @grid[start_row][start_col] = " "
     king.curr_pos = end_pos
     king.can_castle = false
+  end
+
+  def board_from_json(new_board)
+    @grid.each_with_index do |row, idx1|
+      row.each_with_index do |tile, idx2|
+        piece = new_board[idx1][idx2]
+        if piece["piece"] != "String"
+          @grid[idx1][idx2] = piece["piece"].constantize.new(
+            piece["color"],
+            self,
+            [idx1, idx2],
+            {has_castled: piece["has_castled"], can_castle: piece["can_castle"]}
+          )
+          if piece["piece"] == "King"
+            @w_king = self[[idx1, idx2]] if piece["color"] == "white"
+            @b_king = self[[idx1, idx2]] if piece["color"] == "black"
+          end
+        end
+      end
+    end
   end
 
 end

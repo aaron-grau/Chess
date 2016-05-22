@@ -4,8 +4,8 @@ class Piece
 
   def initialize(color, board, curr_pos, options)
     @color, @board, @curr_pos, @selected = color, board, curr_pos, false
-    @can_castle = options["can_castle"];
-    @has_castled = options["has_castled"]
+    @can_castle = options[:can_castle];
+    @has_castled = options[:has_castled]
   end
 
   def moves(board)

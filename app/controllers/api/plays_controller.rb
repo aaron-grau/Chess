@@ -1,4 +1,4 @@
-require_relative '../../../lib/logic/playgame.rb'
+require_relative '../../../lib/logic/game_files.rb'
 
 class Api::PlaysController < ApplicationController
 
@@ -15,10 +15,10 @@ class Api::PlaysController < ApplicationController
       @mate = @board.is_mate?("white")
     end
 
-    render :new
+    render :create
   end
 
-  def new
+  def create
     @board = Board.new
     @mate = false
   end

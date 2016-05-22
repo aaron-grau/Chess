@@ -2,7 +2,7 @@
 class King < Piece
   include SteppingPiece
 
-  def initialize(color, board, curr_pos, options = {"has_castled" => false, "can_castle" => false})
+  def initialize(color, board, curr_pos, options = {has_castled: false, can_castle: false})
     super(color, board, curr_pos, options)
   end
 
