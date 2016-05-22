@@ -1,9 +1,8 @@
 class Board
-
   attr_accessor :grid, :b_king, :w_king
 
   def initialize(new_grid = nil)
-    @grid = Array.new(8){Array.new(8){" "}}
+    @grid = Array.new(8){Array.new(8){nil}}
     if new_grid.nil?
       set_board
       @w_king = self[[7, 4]]
@@ -57,7 +56,7 @@ class Board
 
   def is_empty?(pos)
     row, col = pos
-    !in_bounds?(pos) || self[[row, col]] == " "
+    !in_bounds?(pos) || self[[row, col]] == nil
   end
 
   def is_mate?(color)
@@ -135,7 +134,7 @@ class Board
 
   def move!(start_pos, end_pos)
     self[end_pos] = self[start_pos]
-    self[start_pos] = " "
+    self[start_pos] = nil
   end
 
   def queened?(start_piece, end_row, end_col, end_pos)
@@ -203,9 +202,9 @@ class Board
     grid.each_with_index do |row, row_idx|
       row.each_with_index do |tile, col|
         piece = new_board[row_idx][col]
-        if piece["piece"] != "String"
+        if piece["piece"] != "null"
           self[[row_idx, col]] = create_piece_from_json(piece, row_idx, col)
-          set_king_from_json(piece, row_idx, col)
+          set_king_from_json(piece, row_idx, col) if piece["piece"] == "King"
         end
       end
     end
@@ -221,10 +220,8 @@ class Board
   end
 
   def set_king_from_json(piece, row_idx, col)
-    if piece["piece"] == "King"
-      @w_king = self[[row_idx, col]] if piece["color"] == COLORS[0]
-      @b_king = self[[row_idx, col]] if piece["color"] == COLORS[1]
-    end
+    @w_king = self[[row_idx, col]] if piece["color"] == COLORS[0]
+    @b_king = self[[row_idx, col]] if piece["color"] == COLORS[1]
   end
 
 end

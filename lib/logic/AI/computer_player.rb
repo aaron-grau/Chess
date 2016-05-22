@@ -22,7 +22,7 @@ class ComputerPlayer
     pieces = get_pieces
     @non_captures = []
     #search captures first more likely for alpha spikes allowing for early returns
-    return_mate = test_moves(pieces)
+    return_mate = test_captures(pieces)
     return return_mate unless return_mate.nil?
 
     return_mate = test_non_captures
@@ -41,7 +41,7 @@ class ComputerPlayer
     nil
   end
 
-  def test_moves(pieces)
+  def test_captures(pieces)
     pieces.each do |piece|
       moves = []
       piece_moves = []
@@ -123,6 +123,5 @@ class ComputerPlayer
       @best_move = move
     end
   end
-
 
 end

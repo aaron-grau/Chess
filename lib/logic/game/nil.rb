@@ -1,4 +1,4 @@
-class String
+class NilClass
   def can_castle
     false
   end

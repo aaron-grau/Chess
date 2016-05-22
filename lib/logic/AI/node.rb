@@ -19,8 +19,7 @@ class Node
 
     @non_captures = []
     #search captures first more likely for alpha spikes allowing for early returns
-
-    return_early = test_moves(pieces)
+    return_early = test_captures(pieces)
     return return_early unless return_early.nil?
 
     return_early = test_non_captures
@@ -44,7 +43,7 @@ class Node
     nil
   end
 
-  def test_moves(pieces)
+  def test_captures(pieces)
     pieces.each do |piece|
       moves = []
       piece_moves = []

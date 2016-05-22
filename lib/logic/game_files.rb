@@ -1,4 +1,4 @@
-require_relative 'game/string'
+require_relative 'game/nil'
 require_relative 'game/illegal_move_error'
 require_relative 'pieces/piece'
 require_relative 'pieces/sliding_piece'

@@ -27,7 +27,7 @@ var Tile = React.createClass({
     var piece = <div></div>;
     var connectDropTarget = this.props.connectDropTarget;
     var isOver = this.props.isOver;
-    if (this.props.piece && this.props.piece !== "String") {
+    if (this.props.piece && this.props.piece !== "null") {
       piece = <Piece
         image={this.props.image}
         color={this.props.pieceColor}
