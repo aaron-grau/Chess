@@ -16,8 +16,6 @@ class ComputerPlayer
     find_best_move
   end
 
-
-
   private
 
   def find_best_move
@@ -48,7 +46,7 @@ class ComputerPlayer
     pieces.each do |piece|
       moves = []
       piece_moves = []
-      piece_moves = piece.moves(@board)
+      piece_moves = piece.moves(board)
       piece_moves.each do |target|
         moves << [piece.curr_pos, target]
       end
@@ -68,8 +66,12 @@ class ComputerPlayer
     board.get_pieces(color)
   end
 
+  def get_opp_pieces
+    board.get_pieces(opp_color)
+  end
+
   def depth
-    piece_count = get_pieces.count + board.get_pieces(opp_color).count
+    piece_count = get_pieces.count + get_opp_pieces.count
 
     depth = 2
     depth = 3 if piece_count < 10
@@ -96,15 +98,15 @@ class ComputerPlayer
     @mate_found, @k_castled, @q_castled, @queened = false, false, false, false
     #make move, get eval from child node, undo move
     save_move(move)
-    check_special_move(@board.make_any_move(move[0], move[1]))
+    check_special_move(board.make_any_move(move[0], move[1]))
     #if mate stop and return mate
-    if @board.is_mate?(@opp_color)
+    if board.is_mate?(opp_color)
       undo_move
       @mate_found = true
       return move
     end
-    cur_node = Node.new(@board, @opp_color, @color)
-    new_eval = -1 * cur_node.alpha_beta(depth, -@beta, -@alpha, 1)
+    cur_node = Node.new(board, opp_color, color)
+    new_eval = -1 * cur_node.alpha_beta(depth, -beta, -alpha, 1)
     undo_move
 
     new_eval
@@ -117,7 +119,7 @@ class ComputerPlayer
   end
 
   def alpha_beta_checker(cur_eval, move)
-    if cur_eval > @alpha
+    if cur_eval > alpha
       @alpha = cur_eval
       @best_move = move
     end
