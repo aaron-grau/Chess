@@ -109,9 +109,7 @@ class Board
   end
 
   def make_any_move(start_pos, end_pos, real_board_move = false)
-    start_row, start_col = start_pos
-    end_row, end_col = end_pos
-    start_piece = self[[start_row, start_col]]
+    start_piece = self[start_pos]
 
     legal_move?(start_pos, end_pos) if real_board_move
     start_piece.can_castle = false if start_piece.class == Rook
@@ -122,7 +120,7 @@ class Board
     end
 
     move!(start_pos, end_pos)
-    return "queened" if queened?(start_piece, end_row, end_col, end_pos)
+    return "queened" if queened?(start_piece, end_pos[0], end_pos[1], end_pos)
     start_piece.curr_pos = end_pos
 
     nil
