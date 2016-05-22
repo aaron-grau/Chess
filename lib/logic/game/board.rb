@@ -23,22 +23,6 @@ class Board
     @grid[row][col] = val
   end
 
-  def dup
-    new_board = Board.new(false)
-
-    new_board.grid.each_with_index do |row, idx1|
-      row.each_with_index do |tile, idx2|
-        if grid[idx1][idx2].class < Piece
-          new_board[[idx1, idx2]] = grid[idx1][idx2].dup(new_board)
-        else
-          new_board[[idx1, idx2]] = grid[idx1][idx2].dup
-        end
-      end
-    end
-
-    new_board
-  end
-
   def legal_move?(start, end_pos)
     start_row, start_col = start
     end_row, end_col = end_pos
@@ -55,15 +39,16 @@ class Board
     pos.all?{|el| el >= 0 && el <= 7}
   end
 
-  def in_check?(color)
-    king_pos = color == "white" ? @w_king.curr_pos : @b_king.curr_pos
-
-    opp_pieces = []
-    @grid.each do |row|
-      row.each do |tile|
-        opp_pieces << tile if tile.class < Piece && tile.color != color
-      end
+  def get_pieces(color)
+    grid.flatten.select do |tile|
+      tile.class < Piece && tile.color == color
     end
+  end
+
+  def in_check?(color)
+    king_pos = color == "white" ? w_king.curr_pos : b_king.curr_pos
+    opp_color = color == "white" ? "black" : "white"
+    opp_pieces = get_pieces(opp_color)
 
     opp_pieces.any? do |piece|
       piece.moves(self).include?(king_pos)
@@ -242,16 +227,11 @@ class Board
   end
 
   def board_from_json(new_board)
-    @grid.each_with_index do |row, idx1|
+    grid.each_with_index do |row, idx1|
       row.each_with_index do |tile, idx2|
         piece = new_board[idx1][idx2]
         if piece["piece"] != "String"
-          @grid[idx1][idx2] = piece["piece"].constantize.new(
-            piece["color"],
-            self,
-            [idx1, idx2],
-            {has_castled: piece["has_castled"], can_castle: piece["can_castle"]}
-          )
+          self[[idx1, idx2]] = create_piece_from_json(piece, idx1, idx2)
           if piece["piece"] == "King"
             @w_king = self[[idx1, idx2]] if piece["color"] == "white"
             @b_king = self[[idx1, idx2]] if piece["color"] == "black"
@@ -259,6 +239,15 @@ class Board
         end
       end
     end
+  end
+
+  def create_piece_from_json(piece, row, col)
+    piece["piece"].constantize.new(
+      piece["color"],
+      self,
+      [row, col],
+      {has_castled: piece["has_castled"], can_castle: piece["can_castle"]}
+    )
   end
 
 end
