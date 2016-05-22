@@ -15,12 +15,12 @@ class Board
 
   def [](pos)
     row, col = pos
-    @grid[row][col]
+    grid[row][col]
   end
 
   def []=(pos, val)
     row, col = pos
-    @grid[row][col] = val
+    grid[row][col] = val
   end
 
   def legal_move?(start, end_pos)
@@ -57,7 +57,7 @@ class Board
 
   def is_empty?(pos)
     row, col = pos
-    !in_bounds?(pos) || @grid[row][col] == " "
+    !in_bounds?(pos) || self[[row, col]] == " "
   end
 
   def is_mate?(color)
@@ -70,11 +70,7 @@ class Board
 
   def legal_moves(color)
     legal_moves = []
-
-    pieces =
-      @grid.flatten.select do |tile|
-        tile.class < Piece && tile.color == color
-      end
+    pieces = get_pieces(color)
 
     pieces.each do |piece|
       legal_moves += piece.legal_moves(self)
@@ -85,11 +81,8 @@ class Board
 
   def all_moves_with_start(color)
     all_moves = []
+    pieces = pieces(color)
 
-    pieces =
-      @grid.flatten.select do |tile|
-        tile.class < Piece && tile.color == color
-      end
     pieces.each do |piece|
        piece_moves = piece.moves(self)
        piece_moves.each do |target|
