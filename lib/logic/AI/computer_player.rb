@@ -5,11 +5,9 @@ class ComputerPlayer
 
   include UndoMove
 
-  COLORS = ["white", "black"]
-
   def initialize(color)
     @color = color
-    @opp_color = @color == COLORS[0] ? "black" : "white"
+    @opp_color = @color == COLORS[0] ? COLORS[1] : COLORS[0]
   end
 
   def play_turn(board)

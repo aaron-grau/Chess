@@ -4,17 +4,6 @@ class Node
   :non_captures, :mate_found, :k_castled, :q_castled, :queened, :ply, :no_moves,
   :moved_piece, :last_captured, :reverse_move, :disabled_castling
 
-
-  VALUES = {
-   Pawn => 1,
-   Knight => 3,
-   Bishop => 3,
-   Rook => 5,
-   Queen => 9,
-   King => 10000
-  }
-
-  COLORS = ["white", "black"]
   def initialize(board, color, opp_color)
     @board, @color, @opp_color = board, color, opp_color
   end

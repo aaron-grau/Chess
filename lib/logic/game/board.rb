@@ -46,8 +46,8 @@ class Board
   end
 
   def in_check?(color)
-    king_pos = color == "white" ? w_king.curr_pos : b_king.curr_pos
-    opp_color = color == "white" ? "black" : "white"
+    king_pos = color == COLORS[0] ? w_king.curr_pos : b_king.curr_pos
+    opp_color = color == COLORS[0] ? COLORS[1] : COLORS[0]
     opp_pieces = get_pieces(opp_color)
 
     opp_pieces.any? do |piece|
@@ -154,9 +154,9 @@ class Board
       when 7
         self.grid[idx] = WHITE_PIECES
       when 1
-        set_pawns("black",idx)
+        set_pawns(COLORS[1],idx)
       when 6
-        set_pawns("white", idx)
+        set_pawns(COLORS[0], idx)
       end
     end
   end
@@ -205,8 +205,8 @@ class Board
         if piece["piece"] != "String"
           self[[row_idx, col]] = create_piece_from_json(piece, row_idx, col)
           if piece["piece"] == "King"
-            @w_king = self[[row_idx, col]] if piece["color"] == "white"
-            @b_king = self[[row_idx, col]] if piece["color"] == "black"
+            @w_king = self[[row_idx, col]] if piece["color"] == COLORS[0]
+            @b_king = self[[row_idx, col]] if piece["color"] == COLORS[1]
           end
         end
       end
