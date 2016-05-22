@@ -7,7 +7,7 @@ class Knight < Piece
 
   def moves(board)
     @board = board
-    move_knight(@curr_pos)
+    move_knight(curr_pos)
   end
 
   def inspect
