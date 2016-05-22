@@ -1,7 +1,8 @@
 class Node
   include UndoMove
   attr_accessor :color, :opp_color, :board, :best_eval, :alpha, :beta, :cur_depth,
-    :non_captures, :mate_found, :k_castled, :q_castled, :queened, :ply, :no_moves
+  :non_captures, :mate_found, :k_castled, :q_castled, :queened, :ply, :no_moves,
+  :moved_piece, :last_captured, :reverse_move, :disabled_castling
 
 
   VALUES = {

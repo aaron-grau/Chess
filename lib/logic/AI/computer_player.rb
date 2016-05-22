@@ -1,6 +1,7 @@
 class ComputerPlayer
   attr_accessor :color, :opp_color, :best_move, :board, :best_eval, :alpha, :beta,
-    :non_captures, :mate_found, :k_castled, :q_castled, :queened
+    :non_captures, :mate_found, :k_castled, :q_castled, :queened, :moved_piece,
+    :last_captured, :reverse_move, :disabled_castling
 
   include UndoMove
 
