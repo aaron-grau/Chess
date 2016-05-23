@@ -102,7 +102,6 @@ class Node
         val += w_piece_centralized(piece)
       end
     end
-
     val
   end
 
@@ -228,14 +227,6 @@ class Node
     total
   end
 
-  def special_save(special_move)
-    @castle = false
-    @queened = false
-    @queened = special_move == "queened"
-    @k_castled = special_move == "k_castled"
-    @q_castled = special_move == "q_castled"
-  end
-
   def test_move(move, capture = false)
     @no_moves, @k_castled, @q_castled, @queened = false, false, false, false
 
@@ -247,12 +238,6 @@ class Node
     undo_move
 
     new_eval
-  end
-
-  def check_special_move(special_move)
-    @queened = special_move == "queened"
-    @k_castled = special_move == "k_castled"
-    @q_castled = special_move == "q_castled"
   end
 
   def new_ply(capture)

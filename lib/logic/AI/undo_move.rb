@@ -1,4 +1,3 @@
-
 module UndoMove
 
   def undo_move
@@ -33,5 +32,13 @@ module UndoMove
     @reverse_move  = [end_pos, start]
     @disabled_castling = true if board[start].can_castle
   end
+
+  def check_special_move(special_move)
+    @queened = special_move == :queened
+    @k_castled = special_move == :k_castled
+    @q_castled = special_move == :q_castled
+  end
+
+
 
 end

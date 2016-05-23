@@ -56,7 +56,7 @@ class Board
 
   def is_empty?(pos)
     row, col = pos
-    !in_bounds?(pos) || self[[row, col]] == nil
+    !in_bounds?(pos) || self[[row, col]].nil?
   end
 
   def is_mate?(color)
@@ -95,7 +95,6 @@ class Board
 
   def legal_moves_with_start(color)
     legal_moves = []
-
     pieces = get_pieces(color)
 
     pieces.each do |piece|
@@ -120,7 +119,7 @@ class Board
     end
 
     move!(start_pos, end_pos)
-    return "queened" if queened?(start_piece, end_pos[0], end_pos[1], end_pos)
+    return :queened if queened?(start_piece, end_pos[0], end_pos[1], end_pos)
     start_piece.curr_pos = end_pos
 
     nil
@@ -174,10 +173,10 @@ class Board
 
     if end_col == 6 && start_col == 4
       castle!(king, start_pos, end_pos, 3, 1)
-      return "k_castled"
+      return :k_castled
     elsif end_col == 2 && start_col == 4
       castle!(king, start_pos, end_pos, -4, -1)
-      return "q_castled"
+      return :q_castled
     end
 
     nil

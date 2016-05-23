@@ -111,12 +111,6 @@ class ComputerPlayer
     new_eval
   end
 
-  def check_special_move(special_move)
-    @queened = special_move == "queened"
-    @k_castled = special_move == "k_castled"
-    @q_castled = special_move == "q_castled"
-  end
-
   def alpha_beta_checker(cur_eval, move)
     if cur_eval > alpha
       @alpha = cur_eval

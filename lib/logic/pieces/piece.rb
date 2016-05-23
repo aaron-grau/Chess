@@ -75,9 +75,9 @@ class Piece
   end
 
   def set_special_moves(special_move)
-    @queened = special_move == "queened"
-    @k_castled = special_move == "k_castled"
-    @q_castled = special_move == "q_castled"
+    @queened = special_move == :queened
+    @k_castled = special_move == :k_castled
+    @q_castled = special_move == :q_castled
   end
 
   def castle_check
