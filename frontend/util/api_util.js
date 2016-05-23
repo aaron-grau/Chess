@@ -4,8 +4,8 @@ var ApiUtil = {
 
   fetchNewBoard: function () {
     $.ajax({
-      type: "GET",
-      url: "/api/play/new",
+      type: "POST",
+      url: "/api/play",
       dataType: "json",
       success: function (board_status) {
         var board = board_status.board;

@@ -24,6 +24,7 @@ def test_move(move, capture = false)
   new_eval
 end
 ```
+(full chess logic can be found in the lib/logic directory)
 
 ## Front End
 

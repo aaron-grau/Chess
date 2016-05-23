@@ -1,26 +1,34 @@
-require_relative '../../../lib/logic/playgame.rb'
+require_relative '../../../lib/logic/game_files.rb'
 
 class Api::PlaysController < ApplicationController
+  attr_accessor :mate, :board
 
   def update
-    board = JSON.parse(params[:board])
-    @board = Board.new(board)
+    new_board = JSON.parse(params[:board])
+
+    @board = Board.new(new_board)
     @board.make_any_move(JSON.parse(params[:pos1]), JSON.parse(params[:pos2]))
     @mate = @board.is_mate?("black")
-    unless @mate
-      computer = ComputerPlayer.new("black")
-      cpu_move = computer.play_turn(@board)
-      @last_move = cpu_move
-      @board.make_any_move(cpu_move[0], cpu_move[1])
-      @mate = @board.is_mate?("white")
-    end
 
-    render :new
+    get_cpu_move unless mate
+
+
+    render :create
   end
 
-  def new
+  def create
     @board = Board.new
     @mate = false
+  end
+
+  private
+
+  def get_cpu_move
+    computer = ComputerPlayer.new("black")
+    cpu_move = computer.play_turn(board)
+    @last_move = cpu_move
+    board.make_any_move(cpu_move[0], cpu_move[1])
+    @mate = board.is_mate?("white")
   end
 
 end

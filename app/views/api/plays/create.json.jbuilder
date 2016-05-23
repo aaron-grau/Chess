@@ -3,8 +3,8 @@ pieces = []
 @board.grid.each do |row|
   pieces << []
   row.each do |tile|
-    if tile.class == String
-      pieces.last << {piece: tile.class.to_s}
+    if tile == nil
+      pieces.last << {piece: "null"}
     elsif tile.class == Pawn
       pieces.last << {
         piece: tile.class.to_s,
