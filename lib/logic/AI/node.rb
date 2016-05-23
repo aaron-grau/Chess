@@ -45,12 +45,7 @@ class Node
 
   def test_captures(pieces)
     pieces.each do |piece|
-      moves = []
-      piece_moves = []
-      piece_moves = piece.moves(board)
-      piece_moves.each do |target|
-        moves << [piece.curr_pos, target]
-      end
+      moves = get_moves(piece)
       captures = sort_by_captures(moves)
       captures.each do |move|
         cur_eval = test_move(move, true)
@@ -60,6 +55,13 @@ class Node
     end
 
     nil
+  end
+
+  def get_moves(piece)
+    piece_moves = piece.moves(board)
+    piece_moves.map do |target|
+      [piece.curr_pos, target]
+    end
   end
 
   def get_pieces
