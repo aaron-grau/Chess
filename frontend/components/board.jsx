@@ -42,21 +42,10 @@ var Board = React.createClass({
       var letter_board = []
       var board = this.state.board;
 
-      for (var i = 0; i < 8; i++) {
-        letter_board.push([]);
-        for (var j = 0; j < 8; j++) {
-          letter_board[i].push({
-            piece: board[i][j].piece,
-            color: board[i][j].color,
-            can_castle: board[i][j].can_castle,
-            has_castled: board[i][j].has_castled
-          });
-        }
-      }
-      ApiUtil.makeMove(JSON.stringify(letter_board), JSON.stringify(pos1), JSON.stringify(pos2));
+      ApiUtil.makeMove(JSON.stringify(board), JSON.stringify(pos1), JSON.stringify(pos2));
 
       board[pos2[0]][pos2[1]] = board[pos1[0]][pos1[1]];
-      board[pos1[0]][pos1[1]] = {piece: null};
+      board[pos1[0]][pos1[1]] = {piece: "null"};
       this._castle(pos1, pos2);
       this._queen(pos2);
       this.setState({board: board, moved: true, lastMove: [pos1, pos2]});
@@ -70,10 +59,10 @@ var Board = React.createClass({
     if (board[pos2[0]][pos2[1]].piece === "King" && Math.abs(pos1[1] - pos2[1]) > 1) {
       if (pos1[1] - pos2[1] < 0) {
         board[pos1[0]][pos1[1] + 1] = board[pos1[0]][pos1[1] + 3]
-        board[pos1[0]][pos1[1] + 3] = {piece: null}
+        board[pos1[0]][pos1[1] + 3] = {piece: "null"}
       } else {
         board[pos1[0]][pos1[1] - 1] = board[pos1[0]][pos1[1] - 4]
-        board[pos1[0]][pos1[1] - 4] = {piece: null}
+        board[pos1[0]][pos1[1] - 4] = {piece: "null"}
       }
     }
   },
