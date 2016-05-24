@@ -101,16 +101,19 @@ class ComputerPlayer
     save_move(move)
     check_special_move(board.make_any_move(move[0], move[1]))
     #if mate stop and return mate
-    if board.is_mate?(opp_color)
-      undo_move
-      @mate_found = true
-      return move
-    end
+    return mate_move if board.is_mate?(opp_color)
+
     cur_node = Node.new(board, opp_color, color)
     new_eval = -1 * cur_node.alpha_beta(depth, -beta, -alpha, 1)
     undo_move
 
     new_eval
+  end
+
+  def mate
+    undo_move
+    @mate_found = true
+    return move
   end
 
   def alpha_beta_checker(cur_eval, move)

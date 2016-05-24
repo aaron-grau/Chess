@@ -2,7 +2,7 @@ class Board
   attr_accessor :grid, :b_king, :w_king
 
   def initialize(new_grid = nil)
-    @grid = Array.new(8){Array.new(8){nil}}
+    @grid = Array.new(8) { Array.new(8) }
     if new_grid.nil?
       set_board
       @w_king = self[[7, 4]]
@@ -49,9 +49,7 @@ class Board
     opp_color = color == COLORS[0] ? COLORS[1] : COLORS[0]
     opp_pieces = get_pieces(opp_color)
 
-    opp_pieces.any? do |piece|
-      piece.moves(self).include?(king_pos)
-    end
+    opp_pieces.any? { |piece| piece.moves(self).include?(king_pos) }
   end
 
   def is_empty?(pos)
@@ -187,7 +185,8 @@ class Board
     end_row, end_col = end_pos
 
     rook = self[[start_row, start_col + rook_start]]
-    move!([start_row, start_col + rook_start], [start_row, start_col + rook_end])
+    move!([start_row, start_col + rook_start],
+      [start_row, start_col + rook_end])
     rook.curr_pos = [start_row, start_col + rook_end]
 
     king.has_castled = true

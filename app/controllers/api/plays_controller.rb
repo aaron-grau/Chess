@@ -7,11 +7,10 @@ class Api::PlaysController < ApplicationController
     new_board = JSON.parse(params[:board])
 
     @board = Board.new(new_board)
-    @board.make_any_move(JSON.parse(params[:pos1]), JSON.parse(params[:pos2]))
-    @mate = @board.is_mate?(COLORS[1])
+    board.make_any_move(JSON.parse(params[:pos1]), JSON.parse(params[:pos2]))
+    @mate = board.is_mate?(COLORS[1])
 
     get_cpu_move unless mate
-
 
     render :create
   end
