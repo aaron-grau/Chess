@@ -84,7 +84,7 @@ class Node
 
   def check_penalty(opp_pieces, pieces)
     val = 0
-    val = -1 if pieces.length < 5 && board.in_check?(color)
+    val = -1 if opp_pieces.length < 5 && board.in_check?(color)
 
     val
   end
