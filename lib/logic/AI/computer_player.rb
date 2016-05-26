@@ -56,7 +56,7 @@ class ComputerPlayer
   end
 
   def get_moves(piece)
-    piece_moves = piece.moves(board)
+    piece_moves = piece.legal_moves(board)
     piece_moves.map do |target|
       [piece.curr_pos, target]
     end

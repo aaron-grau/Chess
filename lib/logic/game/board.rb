@@ -28,7 +28,7 @@ class Board
     piece = grid[start_row][start_col]
 
     unless piece.legal_moves(self).include?(end_pos)
-      raise IllegalMoveError.new("Illegal Move!")
+      raise IllegalMoveError.new
     end
 
     true
@@ -108,7 +108,7 @@ class Board
   def make_any_move(start_pos, end_pos, real_board_move = false)
     start_piece = self[start_pos]
 
-    legal_move?(start_pos, end_pos) if real_board_move
+    # legal_move?(start_pos, end_pos) if real_board_move
     start_piece.can_castle = false if start_piece.class == Rook
 
     if start_piece.class == King
