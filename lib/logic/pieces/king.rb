@@ -25,14 +25,14 @@ class King < Piece
   end
 
   def king_side_castle_legal?
-    can_castle && board[[curr_pos[0], curr_pos[1] + 3]] < Piece &&
+    can_castle && board[[curr_pos[0], curr_pos[1] + 3]].class == Rook &&
       board[[curr_pos[0], curr_pos[1] + 3]].can_castle &&
       board.is_empty?([curr_pos[0], curr_pos[1] + 1]) &&
       board.is_empty?([curr_pos[0], curr_pos[1] + 2])
   end
 
   def queen_side_castle_legal?
-    can_castle && board[[curr_pos[0], curr_pos[1] - 4]] < Piece &&
+    can_castle && board[[curr_pos[0], curr_pos[1] - 4]].class == Rook &&
       board[[curr_pos[0], curr_pos[1] - 4]].can_castle &&
       board.is_empty?([curr_pos[0], curr_pos[1] - 1]) &&
       board.is_empty?([curr_pos[0], curr_pos[1] - 2]) &&
