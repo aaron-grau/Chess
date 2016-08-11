@@ -40,6 +40,11 @@ class Piece
     self.class.new(color, new_board, curr_pos)
   end
 
+  def reset_moves(move)
+    return if @moves.nil?
+    @moves = nil if @moves.include?(move[0]) || @moves.include?(move[1])
+  end
+
 
   private
 

@@ -6,8 +6,13 @@ class Queen < Piece
   end
 
   def moves(board)
+    return @moves.to_a unless @moves.nil?
+
     @board = board
-    move_diag(curr_pos) + move_straight(curr_pos)
+    new_moves = move_diag(curr_pos) + move_straight(curr_pos)
+    @moves = Set.new(new_moves)
+
+    new_moves
   end
 
   def inspect

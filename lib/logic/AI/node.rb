@@ -234,6 +234,10 @@ class Node
 
     #make move, get eval from child node, undo move
     save_move(move)
+    pieces = get_pieces + get_opp_pieces
+    pieces.each do |piece|
+      piece.reset_moves!(move)
+    end
     check_special_move(board.make_any_move(move[0], move[1]))
     new_node = Node.new(board, opp_color, color)
     new_eval = -1 * new_node.alpha_beta(new_ply(capture), -beta, -alpha, cur_depth + 1)
